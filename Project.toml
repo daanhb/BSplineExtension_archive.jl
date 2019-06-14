@@ -1,0 +1,23 @@
+name = "BSplineExtension"
+uuid = "0b21e58f-1780-5391-9880-11ae5a9ef91b"
+authors = ["vincentcp"]
+version = "0.0.0"
+
+[deps]
+CardinalBSplines = "87d49508-7ad8-11e8-0eda-cb6920b58870"
+CompactTranslatesDict = "455b6770-8cd4-11e8-0457-dd6f5558b097"
+DomainSets = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
+FrameFun = "bbafa164-4497-5d18-87cf-33e911f89480"
+InfiniteVectors = "a3035606-0d97-52a5-9f37-19f5f67b7424"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+
+[compat]
+julia = "1.1"
+
+[extras]
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Plots", "Test"]
