@@ -1,6 +1,5 @@
 using Pkg
 Pkg.develop(PackageSpec(path=splitdir(@__DIR__)[1]))
-pkg"instantiate"
 using Documenter, BSplineExtension
 
 const render_pdf = "pdf" in ARGS
@@ -17,19 +16,16 @@ else
         prettyurls = ("deploy" in ARGS),
     )
 end
-
+ENV["JULIA_DEBUG"] = ""
 makedocs(sitename="BSplineExtension.jl",
     modules = [BSplineExtension],
     authors = "vincentcp",
     format = format,
     pages = [
         "Home" => "index.md",
-        "Manual" => Any["man/evaluation.md",
-            "man/integration.md",
-            "man/filters.md"
-            ]
+        "Manual" => ["Basis platform" => "man/basisplatform.md"]
         ],
-    doctest=true
+    doctest=:fix
 )
 
 if "deploy" in ARGS && Sys.ARCH === :x86_64 && Sys.KERNEL === :Linux

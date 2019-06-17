@@ -1,3 +1,4 @@
 [deps]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 BSplineExtension = "0b21e58f-1780-5391-9880-11ae5a9ef91b"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+PGFPlotsX = "8314cec4-20b6-5062-9cdb-752b83310925"

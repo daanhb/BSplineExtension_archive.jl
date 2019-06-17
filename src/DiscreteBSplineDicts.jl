@@ -7,6 +7,50 @@ using CardinalBSplines: compact_dualperiodicbsplinesignal
 string(::Integers) = "The integers (ℤ)"
 using CompactTranslatesDict: PeriodicBSplineBasis
 
+export DiscreteBSplineDict
+"""
+    struct DiscreteBSplineDict{T,K} <: PeriodicBSplineBasis{T,K}
+
+Compact, discrete, periodic dual --- with respect to a `DiracCombMeasure` ---
+to the B-spline basis consisting of equispaced
+periodic translates of a B-spline (see `BSplineTranslatesBasis` of `CompactTranslatesDict`).
+
+Since this basis is discrete, it can only be evaluated in an `PeriodicEquispacedGrid`.
+
+Used in [`CDBSplinePlatform`](@ref)
+
+# Example
+```jldocs
+julia> B = DiscreteBSplineDict(3,2,10)
+Equispaced translates of a discrete kernel dual to B-spline
+    ↳ length = 10
+    ↳ Float64 -> Float64
+    ↳ support = 0.0..1.0 (Unit)
+    ↳ degree = 3
+    ↳ m = 2
+
+
+
+julia> A = evaluation_operator(B, PeriodicEquispacedGrid(10, support(B)))
+Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
+
+
+
+julia> Matrix(A)
+10×10 Array{Float64,2}:
+  0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734
+ -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106
+  0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352
+  0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0
+  0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0
+  0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0
+  0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352
+  0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106
+  0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734
+ -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283
+
+```
+"""
 struct DiscreteBSplineDict{T,K} <: PeriodicBSplineBasis{T,K}
     m      ::   Int
     n      ::   Int

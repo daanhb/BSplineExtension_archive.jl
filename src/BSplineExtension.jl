@@ -3,13 +3,15 @@ using Reexport, LinearAlgebra
 @reexport using CompactTranslatesDict, FrameFun, DomainSets
 
 using FrameFun: BasisPlatform, FramePlatform, ExtensionFramePlatform, Measure
-import FrameFun: dictionary, first_parameters, SolverStyle, measure, azdual_dict, SamplingStyle
+import FrameFun: dictionary, first_parameters, SolverStyle, measure, azdual_dict, SamplingStyle,
+    SolverStyle
+include("plots.jl")
 
 
 abstract type AbstractBSplinePlatform{T,D} <: BasisPlatform end
 dictionary(p::AbstractBSplinePlatform{T,D}, n) where {T,D} = BSplineTranslatesBasis{T,D}(n)
 first_parameters(p::AbstractBSplinePlatform) = (8,8)
-SolverStyle(p::AbstractBSplinePlatform, ::OversamplingStyle) = DualStyle()
+SolverStyle(p::AbstractBSplinePlatform, ::SamplingStyle) = DualStyle()
 
 export BSplinePlatform
 """
@@ -129,6 +131,9 @@ function azdual_dict(sstyle::SamplingStyle, platform::EpsBSplinePlatform, param,
     # we want \|I-G (G̃+E)\|< threshold, therefore \|E\| < threshold / \|G\|
     mask = abs.(column) .< threshold / norm(inv(op).A.vcvr_dft,Inf)
     bw = (findfirst(mask), findlast(mask))
+    if bw[1] == nothing
+        return dual
+    end
     a = [column[bw[2]:end];column[1:bw[1]]]
     # Create bandlimited operator (which is also circulant)
     op_replace = VerticalBandedOperator(src(op), dest(op), a, 1, -1+bw[2]-length(dual))
@@ -139,7 +144,11 @@ export CDBSplinePlatform
 """
     struct CDBSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
 
-See also: [`BSplinePlatform`](@ref), [`EpsBSplinePlatform`](@ref)
+A platform of equispaced periodic translates of B-spline of a given order.
+Their duals dictionaries are compact, but discrete, i.e.,
+their values are known in an `PeriodicEquispacedGrid`
+
+See also: [`DiscreteBSplineDict`](@ref), [`BSplinePlatform`](@ref), [`EpsBSplinePlatform`](@ref)
 
 # Example
 ```jldocs

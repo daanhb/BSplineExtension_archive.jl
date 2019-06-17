@@ -1,6 +1,8 @@
 
 using LinearAlgebra, BSplineExtension, Test
-@testset "BSpline platforms, dual dictionaries" begin
+using BSplineExtension.FrameFun: approximationproblem
+
+@testset "BSpline platforms, dictionaries" begin
 
 
     P = BSplinePlatform()
@@ -35,4 +37,28 @@ using LinearAlgebra, BSplineExtension, Test
     d2 = azdual_dict(P,20)
     g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,20)))
     @test IdentityOperator(d1)≈g2
+end
+
+using Test, BSplineExtension
+
+@testset "Basis platform approximation" begin
+
+    P1 = BSplinePlatform()
+    P2 = EpsBSplinePlatform()
+    P3 = CDBSplinePlatform()
+    @test SamplingStyle(approximationproblem(P1,10)) == InterpolationStyle()
+    @test SamplingStyle(approximationproblem(P2,10)) == InterpolationStyle()
+    @test SamplingStyle(approximationproblem(P3,10)) == OversamplingStyle()
+
+    # Test the approximation power
+    f = x->exp(cos(10pi*x))
+    N = 60
+    x = PeriodicEquispacedGrid(10N, support(dictionary(P1,10)))
+    t = .123
+    for P in (P1,P2,P3)
+        @test SolverStyle(InterpolationStyle(), approximationproblem(P1, 10)) == DualStyle()
+        F = Fun(f, P, N)
+        @test norm(F.(x)-f.(x),Inf)  < .005
+        @test abs(F(t)-f(t)) < .0002
+    end
 end

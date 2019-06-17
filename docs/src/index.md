@@ -1,40 +1,31 @@
 
-# CardinalBSplines.jl Documentation
+# BSplineExtension.jl documentation
 
-*A Julia package for B-splines operations*
+*A Julia package for B-spline extension approximations*
 
-For installation instructions, see [Installation](@ref).
-
-For a  full description of the functionality use the manual:
-```@contents
-Pages = ["man/evaluation.md","man/integration.md","man/filters.md"]
-```
 
 ## Installation
 
-CardinalBSplines.jl is not added to the Julia General registry and depends on a unregistered package InfiniteVectors.jl.
+`BSplineExtension.jl` is not added to the Julia General registry, it is however in the FrameFun registry.
 
 ### Recomanded
-For Julia 1.1 or higher, you can add the FrameFun registry and than add CardinalBSplines.
+For Julia 1.1 or higher, you can add the FrameFun registry to the list of your registries. Then add `BSplineExtension.jl`.
 From the Julia REPL, type `]` to enter Pkg mode and run
 
 ```julia
 pkg> add https://github.com/vincentcp/FrameFunRegistry
-pkg> add CardinalBSplines
+pkg> add BSplineExtension
 ```
 
 ### Legacy
-In Julia 1.0, the packages can be installed by cloning their git repository. From the Julia REPL, type `]` to enter Pkg mode and run
+In Julia 1.0, the package and its dependencies can be installed by cloning their git repository. From the Julia REPL, type `]` to enter Pkg mode and run
 
 ```julia
 pkg> add https://github.com/vincentcp/InfiniteVectors.jl
 pkg> add https://github.com/vincentcp/CardinalBSplines.jl
+pkg> add https://github.com/vincentcp/CompactTranslatesDict.jl
+pkg> add https://github.com/JuliaApproximation/FrameFun.jl
 ```
 
-or in a file you could use
-
-```julia
-using Pkg
-pkg"add https://github.com/vincentcp/InfiniteVectors.jl"
-pkg"add https://github.com/vincentcp/CardinalBSplines.jl"
-```
+## Manual
+This module consists of multiple platforms.
