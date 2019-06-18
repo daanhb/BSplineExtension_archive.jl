@@ -14,8 +14,8 @@ include("basisplatforms.jl")
 
 function nonzero_coefficients(dict::CompactTranslatesDict.DiffPeriodicBSplineBasis, x::Real)
     w = (degree(dict)+1)
-    os = iseven(degree(dict)) ? .5 : 0
-    floor(Int, os + x/step(dict)) .+ (-(w>>1)+1:((w+1)>>1))
+    os = iseven(degree(dict)) ? -.5 : 0
+    floor(Int, 1 + os + x/step(dict)) .+ (-(w>>1)+1:((w+1)>>1))
 end
 
 include("BSplineExtensionSolver.jl")

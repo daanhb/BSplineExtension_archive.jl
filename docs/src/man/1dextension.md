@@ -1,7 +1,7 @@
 
 # 1D B-spline extension
 ```@setup 1dframe
-using PGFPlotsX, BSplineExtension, DomainSets
+using PGFPlotsX, BSplineExtension, DomainSets, LaTeXStrings
 P1 = ExtensionFramePlatform(BSplinePlatform(),0.0..0.5)
 P1 = ExtensionFramePlatform(EpsBSplinePlatform(),0.0..0.5)
 P1 = ExtensionFramePlatform(CDBSplinePlatform(),0.0..0.5)
@@ -55,10 +55,10 @@ D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 julia> AZ_Zt(P1,N;L=4N)
-Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
+Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
 
-M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
-M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
 E	:	Extending coefficients by zero padding
 D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
@@ -169,6 +169,82 @@ savefigs("truncated_size_2", ans) # hide
 [\[.pdf\]](truncated_size_2.pdf), [\[generated .tex\]](truncated_size_2.tex)
 
 ![](truncated_size_2.svg)
+
+# B-spline extension approximation
+The [`BSplineExtensionSolver`](@ref) is just a means to an end. It is used in the
+first step of the AZ algorithm. In this section we use the solver to approximate
+the exponential function on the interval [0,0.5] using a B-spline basis of order
+`m` on the interval [0,1]. First we show the convergence results, then the time complexity
+of the approximation algorithm.
+
+## Errors
+In the figure below, which shows the uniform error of approximating a 1 dimensional analytic function (details are in the introduction of this section),
+ we see that convergence is algebraic ($$\mathcal O(N^{-m})$$).
+This is common behaviour for approximating with splines.
+
+```@example 1dframe
+PLATFORMs = (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform) # hide
+Ns1 = [1<<k for k in 4:10] # hide
+Ns2 = [1<<k for k in 9:16] # hide
+ds = 1:4 # hide
+errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns1)) # hide
+timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2)) # hide
+for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
+    P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5) #hide
+    F,_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
+    errors[i,j,k] = abserror(exp, F) #hide
+end #hide
+for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2) #hide
+    P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); #hide
+    _,timings[i,j,k],_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver,  crop=true, crop_tol=1e-10) #hide
+end # hide
+A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
+    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+    for (j,d) in enumerate(ds) # hide
+        opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
+        push!(A, @pgf Plot(opts, Table(Ns1, errors[i,j,:]))) # hide
+        i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
+    end # hide
+end # hide
+@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
+    A...) # hide
+savefigs("1derrors", ans) # hide
+```
+
+[\[.pdf\]](1derrors.pdf), [\[generated .tex\]](1derrors.tex)
+
+![](1derrors.svg)
+## Timings
+For all platforms, the most costly part is the evaluating operator-vector multiply ``(A-AZ'A)x` since
+solving the system is constant in `N` (it is $$\mathcal O(d^3)$$).
+For the first platform the operator-vector multiply time complexity is $$\mathcal O(N\log N)$$. For the
+last two the multiply time complexity is $$\mathcal O(N)$$. However, the construction complexity of `Z'` for the first two
+platforms is also $$\mathcal O(N\log N)$$.  
+
+The quasi-linear behaviour of the method is confirmed in the figure below that
+show the timings for approximating a 1 dimensional analytic function
+    (details are in the introduction of this section).
+
+```@example 1dframe
+A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
+    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+    for (j,d) in enumerate(ds) # hide
+        opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
+        push!(A, @pgf Plot(opts, Table(Ns2, timings[i,j,:]))) # hide
+        i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
+    end # hide
+    push!(A, @pgf Plot({color="black",dashed},Table(Ns2,5e-6Ns2))) # hide
+    i==1 && push!(A, LegendEntry(L"\mathcal O(N)")) # hide
+end # hide
+@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
+    A...) # hide
+savefigs("1dtimings", ans) # hide
+```
+
+[\[.pdf\]](1dtimings.pdf), [\[generated .tex\]](1dtimings.tex)
+
+![](1dtimings.svg)
+
 
 
 # B-spline extension Reference

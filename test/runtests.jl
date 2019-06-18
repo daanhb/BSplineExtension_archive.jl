@@ -68,9 +68,24 @@ using Test, BSplineExtension
     end
 end
 
-using Test, BSplineExtension, GridArrays, DomainSets
-using BSplineExtension: coefficient_indices_of_overlapping_elements
 
+using Test, BSplineExtension
+@testset "BSplineTranslatesBasis, nonzero coefficients" begin
+    modandsort = x->sort(mod.(x .- 1,5) .+ 1)
+    for d in 1:4
+        for dict in (BSplineTranslatesBasis(5,d), BSplineTranslatesBasis(10,d))
+            @test modandsort(nonzero_coefficients(dict, eps())) == modandsort(findall(evaluation_matrix(dict, eps())[:] .!= 0))
+            for t in .1:.1:.9
+                @test modandsort(nonzero_coefficients(dict, t-eps())) == modandsort(findall(evaluation_matrix(dict, t-eps())[:] .!= 0))
+                @test modandsort(nonzero_coefficients(dict, t+eps())) == modandsort(findall(evaluation_matrix(dict, t+eps())[:] .!= 0))
+            end
+        end
+    end
+end
+
+
+using Test, BSplineExtension, GridArrays
+using BSplineExtension: coefficient_indices_of_overlapping_elements
 @testset "Extensionframe platform, nonzero indices" begin
     dict = BSplineTranslatesBasis(5,2)
     @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, 0,.1)) == [1,2,5]
@@ -88,12 +103,12 @@ using BSplineExtension: coefficient_indices_of_overlapping_elements
     @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .9+eps(),1. -eps())) == [1,2,5]
 
     dict = BSplineTranslatesBasis(5,3)
-    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, 0,.2)) == [1,2,4,5]
-    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .2,.4)) == [1,2,3,5]
-    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .4,.6)) == [1,2,3,4]
+    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, 0,.2)) == [1,2,3,5]
+    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .2,.4)) == [1,2,3,4]
+    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .4,.6)) == [2,3,4,5]
     @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .6,.8)) == [1,2,3,4,5]
-    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .8,1)) == [1,3,4,5]
-    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .6+eps(),.8-eps())) == [2,3,4,5]
+    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .8,1)) == [1,2,4,5]
+    @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, .6+eps(),.8-eps())) == [1,3,4,5]
 
     g = MidpointEquispacedGrid(100,UnitInterval())
     b = g[findall(GridArrays.boundary_mask(g, 0.0..0.5, true))]
@@ -102,7 +117,7 @@ using BSplineExtension: coefficient_indices_of_overlapping_elements
     @test m1[:]==m2[:]
 end
 
-using BSplineExtension, Test, DomainSets
+using BSplineExtension, Test
 using BSplineExtension.FrameFun: ExtensionFramePlatform
 using BSplineExtension: nonzero_rows, nonzero_cols
 @testset "ExtensionFramePlatform, nonzero_rows, nonzero_cols" begin
@@ -125,7 +140,7 @@ using BSplineExtension: nonzero_rows, nonzero_cols
         findall(sum(abs.(Matrix(M));dims=2)[:] .> 1e-10)
 end
 
-using BSplineExtension, Test, DomainSets
+using BSplineExtension, Test
 using BSplineExtension.FrameFun: ExtensionFramePlatform
 using BSplineExtension: BSplineExtensionSolver
 @testset "ExtensionFramePlatform, BSplineExtensionSolver approximation power" begin
@@ -143,15 +158,107 @@ using BSplineExtension: BSplineExtensionSolver
         end
 end
 
-using BSplineExtension, Test, DomainSets
+using BSplineExtension, Test
 using BSplineExtension.FrameFun: ExtensionFramePlatform
 using BSplineExtension: BSplineExtensionSolver
 @testset "ExtensionFramePlatform, BSplineExtensionSolver AZ approximation power" begin
-        for d in 1:5
-            for PLATFORM in (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
-                P = ExtensionFramePlatform(EpsBSplinePlatform(1), 0.0..0.5); N = 30
-                F = Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver, L=4N, crop=true)
-                @test abserror(exp, F) < 1e-4
-            end
+    for d in 1:5
+        for PLATFORM in (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
+            P = ExtensionFramePlatform(EpsBSplinePlatform(1), 0.0..0.5); N = 30
+            F = Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver, L=4N, crop=true)
+            @test abserror(exp, F) < 1e-4
         end
+    end
+end
+
+
+
+using BSplineExtension, Test
+@testset "ExtensionFramePlatform, BSplineExtensionSolver truncated size" begin
+    Ns = 20:20:300
+    ds = 1:4
+    PLATFORMs = (BSplinePlatform, EpsBSplinePlatform, CDBSplinePlatform)
+    crop_tols = 10.0.^(-16.:6.:-10.)
+    colsizes = Array{Int}(undef, length(PLATFORMs), length(ds), length(Ns), length(crop_tols))
+    rowsizes = similar(colsizes)
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns), (l,crop_tol) in enumerate(crop_tols)
+        P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5);
+        plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N);
+        M = plunge*A;
+        colsizes[i,j,k,l], rowsizes[i,j,k,l]  = truncated_size(BSplineExtensionSolver(M; crop_tol=crop_tol))
+    end
+
+    @test all(rowsizes[:,1,:,:] .== 4)
+    @test all(rowsizes[:,2,:,:] .== 6)
+    @test all(rowsizes[:,3,:,:] .== 8)
+    @test all(rowsizes[:,4,:,:] .== 10)
+
+    # Test CDBSplinePlatform
+    @test all(18 .<= colsizes[3,1,:,1] .<= 23)
+    @test all(4 .<= colsizes[3,1,:,2] .<= 8)
+    @test all(36 .<= colsizes[3,2,:,1] .<= 43)
+    @test all(20 .<= colsizes[3,2,:,2] .<= 20)
+    @test all(41 .<= colsizes[3,4,:,2] .<= 44)
+    @test all(72 .<= colsizes[3,4,:,1][2:end] .<= 74)
+
+    @test all(188 .<= colsizes[2,1,:,1][end-1:end] .<= 188)
+    @test all(138 .<= colsizes[2,1,:,2][end-1:end] .<= 138)
+    @test all(324 .<= colsizes[2,2,:,1][end-1:end] .<= 324)
+    @test all(222 .<= colsizes[2,2,:,2][end-1:end] .<= 224)
+    @test all(354 .<= colsizes[2,4,:,2][end-1:end] .<= 356)
+    @test all(558 .<= colsizes[2,4,:,1][2:end][end-1:end] .<= 561)
+
+    @test all(136 .<= colsizes[1,1,:,2][end-4:end] .<= 138)
+    @test all(220 .<= colsizes[1,2,:,2][end-4:end] .<= 224)
+    @test all(288 .<= colsizes[1,3,:,2][end-4:end] .<= 290)
+    @test all(350 .<= colsizes[1,4,:,2][end-4:end] .<= 356)
+end
+
+using BSplineExtension, Test
+@testset "ExtensionFramePlatform, BSplineExtensionSolver loss of information" begin
+    Ns = [300,]
+    ds = 1:4
+    PLATFORMs = (BSplinePlatform, EpsBSplinePlatform, CDBSplinePlatform)
+    crop_tols = [1e-8,]
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns), (l,crop_tol) in enumerate(crop_tols)
+        P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5);
+        plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N);
+        M = plunge*A;
+        S = BSplineExtensionSolver(M; crop_tol=crop_tol)
+        @test all(size(M) .> truncated_size(S))
+        @test norm(M)≈norm(S.sol.op)
+    end
+end
+
+
+using Test, BSplineExtension, Statistics
+@testset "1d spline extension approximation, errors, and timings" begin 
+    PLATFORMs = (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
+        Ns1 = [1<<k for k in 4:10]
+        Ns2 = [1<<k for k in 9:16]
+        ds = 1:4
+        errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns1))
+        timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2))
+
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1)
+        P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5);
+        F,_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10)
+        errors[i,j,k] = abserror(exp, F)
+    end
+
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2)
+        P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5);
+        timings[i,j,k]= median([@timed(Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10))[2] for l in 1:4])
+    end
+
+    # Test if errors go down fast enough
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds)
+        @test all(errors[i,j,:] .<= max.(Float64.(Ns1).^(-d)*errors[i,j,1]*Ns1[1]^d, 1e-10))
+    end
+
+    # Test if method is fast enough
+    for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds)
+        @test all(timings[i,j,:] .<= 5e-5Ns2)
+    end
+
 end
