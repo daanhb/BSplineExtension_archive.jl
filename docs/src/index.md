@@ -29,3 +29,14 @@ pkg> add https://github.com/JuliaApproximation/FrameFun.jl
 
 ## Manual
 This module consists of multiple platforms.
+
+
+```@autodocs
+Modules = [BSplineExtension]
+Pages = ["nonzero_cols.jl"]
+```
+
+```@autodocs
+Modules = [BSplineExtension]
+Pages = ["BSplineExtensionSolver.jl"]
+```

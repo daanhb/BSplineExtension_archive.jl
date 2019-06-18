@@ -77,7 +77,10 @@ unsafe_eval_element(dict::DiscreteBSplineDict, i, x) =
     error("`DiscreteBSplineDict` can only be evaluated in `PeriodicEquispacedGrid`")
 grid_evaluation_operator(dict::DiscreteBSplineDict, gb::GridBasis, grid::AbstractGrid) =
     error("`DiscreteBSplineDict` can only be evaluated in `PeriodicEquispacedGrid`")
-
+grid_evaluation_operator(dict::DiscreteBSplineDict, dgs::GridBasis, grid::AbstractEquispacedGrid) =
+    error("`DiscreteBSplineDict` can only be evaluated in `PeriodicEquispacedGrid`")
+eval_kernel(dict::DiscreteBSplineDict, x) =
+    error("`DiscreteBSplineDict` can only be evaluated in `PeriodicEquispacedGrid`") 
 
 function grid_evaluation_operator(dict::DiscreteBSplineDict{T}, gb::GridBasis, grid::PeriodicEquispacedGrid; options...) where {T}
     @assert support(dict) ≈ support(grid)

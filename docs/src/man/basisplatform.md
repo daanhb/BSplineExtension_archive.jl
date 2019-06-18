@@ -141,7 +141,7 @@ savefigs("convergence_basis", ans) # hide
 
 ```@autodocs
 Modules = [BSplineExtension]
-Pages = ["BSplineExtension.jl"]
+Pages = ["basisplatforms.jl"]
 ```
 
 The dual dictionary used in [`CDBSplinePlatform`](@ref) is
