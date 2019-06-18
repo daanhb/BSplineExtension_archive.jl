@@ -23,7 +23,8 @@ makedocs(sitename="BSplineExtension.jl",
     format = format,
     pages = [
         "Home" => "index.md",
-        "Manual" => ["Basis platform" => "man/basisplatform.md"]
+        "Manual" => ["Basis platform" => "man/basisplatform.md",
+                    "1D extension platform" => "man/1dextension.md"]
         ],
     doctest=:fix
 )

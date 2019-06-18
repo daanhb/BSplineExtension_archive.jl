@@ -28,15 +28,4 @@ pkg> add https://github.com/JuliaApproximation/FrameFun.jl
 ```
 
 ## Manual
-This module consists of multiple platforms.
-
-
-```@autodocs
-Modules = [BSplineExtension]
-Pages = ["nonzero_cols.jl"]
-```
-
-```@autodocs
-Modules = [BSplineExtension]
-Pages = ["BSplineExtensionSolver.jl"]
-```
+This module consists of multiple platforms. Three of them are basis platforms. Each of them provide a `BSplineTranslatesBasis` if asked for a dictionary; but they all provide a different kind of dual dictionary, see [Basis platforms](@ref). The module also extends the `FrameFun` framework to 1 dimensional B-spline extensions, see [1D B-spline extension](@ref). 

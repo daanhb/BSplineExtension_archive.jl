@@ -12,7 +12,7 @@ export nonzero_coefficients
 """
     nonzero_coefficients(dict::Dictionary1d, x::Real)
 
-Return the coefficient indices (`UnitRange`) of the basis elements that evaluate non zero in `x`
+Return the coefficient indices (`UnitRange`) of the `dict` elements that evaluate non zero in `x`
 """
 function nonzero_coefficients(dict::Dictionary1d, x::Real)
     # The init_index is the starting index of all spline elements that overlap with x

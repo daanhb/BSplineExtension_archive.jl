@@ -26,7 +26,7 @@ See also:  [`nonzero_coefficients`](@ref)
 ## Keywords
 - `directsolver::Symbol = :qr`: The direct solver to use to solve the left-over
     truncated Operator `M`. See `FrameFun`.
-- `crop::Bool = false`: Truncate the nonzero rows too.
+- `crop::Bool = true`: Truncate the nonzero rows too.
 - `crop_tol::Number = 0`: If `crop` is true, truncate the rows with elements smaller than `crop_tol`.
 - `verbose::Bool = false`: Print method information. See `FrameFun`
 
@@ -65,7 +65,7 @@ julia> Fun(exp, P, N; L=4N, REG = BSplineExtensionSolver)
 DictFun{Float64,Float64}(A 1-dimensional Expansion with 30 degrees of freedom.
 Basis: Extension frame
 )
- 
+
 ```
 """
 struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOperator{T}
@@ -78,7 +78,7 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
     grid_scratch
 
     function BSplineExtensionSolver(M::DictionaryOperator{T};
-            crop=false, crop_tol=0, directsolver=:qr, verbose=false, options...) where T
+            crop=true, crop_tol=0, directsolver=:qr, verbose=false, options...) where T
         nonzero_cols = BSplineExtension.nonzero_cols(basis(src(M)), supergrid(FrameFun.BasisFunctions.grid(dest(M))), support(src(M)))
         dict_resop = IndexRestrictionOperator(src(M), src(M)[nonzero_cols], nonzero_cols)
 
@@ -113,6 +113,14 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
         new{T}(M, grid_resop, dict_resop', FrameFun.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...), zeros(length(nonzero_cols)), zeros(dest(grid_resop)))
     end
 end
+
+export truncated_size
+"""
+    truncated_size(op::BSplineExtensionSolver)
+
+The size of the smaller system. The one that has to be solved with a direct solver.
+"""
+truncated_size(op::BSplineExtensionSolver) = size(inv(op.sol))
 
 function FrameFun.BasisFunctions.linearized_apply!(op::BSplineExtensionSolver, dest::Vector, src::Vector)
     FrameFun.BasisFunctions.apply!(op.grid_res, op.grid_scratch, src)

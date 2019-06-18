@@ -82,7 +82,7 @@ Equispaced translates of a discrete kernel dual to B-spline
     ↳ m = 2
 ```
 
-## Function approximation
+# Function approximation
 
 These duals are used to approximate functions if the `SolverStyle` option is equal to `DualStyle` (default):
 
@@ -110,7 +110,7 @@ savefigs("basis", ans) # hide
 
 ![](basis.svg)
 
-### Convergence
+## Convergence
 
 The convergence curves show no difference between the different approaches:
 ```@example basis
@@ -137,7 +137,7 @@ savefigs("convergence_basis", ans) # hide
 
 ![](convergence_basis.svg)
 
-## B-Spline BasisPlatforms Reference
+# B-Spline BasisPlatforms Reference
 
 ```@autodocs
 Modules = [BSplineExtension]
