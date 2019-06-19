@@ -1,5 +1,5 @@
 abstract type AbstractBSplinePlatform{T,D} <: BasisPlatform end
-dictionary(p::AbstractBSplinePlatform{T,D}, n) where {T,D} = BSplineTranslatesBasis{T,D}(n)
+dictionary(p::AbstractBSplinePlatform{T,D}, n::Int) where {T,D} = BSplineTranslatesBasis{T,D}(n)
 first_parameters(p::AbstractBSplinePlatform) = (8,8)
 SolverStyle(p::AbstractBSplinePlatform, ::SamplingStyle) = DualStyle()
 correct_sampling_parameter(::AbstractBSplinePlatform, param, L; options...) = error()

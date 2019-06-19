@@ -102,8 +102,8 @@ using Test, BSplineExtension
 
     P = ExtensionFramePlatform(NdBSplinePlatform((1,3)),(0.0..0.5)^2)
     N = 10
-    @test operator(basis(azdual_dict(P,(N,N);L=(4N,4N))))≈
-        operator(basis(azdual_dict(P,(N,N),oversamplingfactor=4)))
+    @test all(operator.(elements(basis(azdual_dict(P,(N,N);L=(4N,4N))))) .≈
+        operator.(elements(basis(azdual_dict(P,(N,N),oversamplingfactor=4)))))
 end
 
 using Test, BSplineExtension
@@ -122,10 +122,30 @@ using Test, BSplineExtension
     x = PeriodicEquispacedGrid(10N, support(dictionary(P1,10)))
     t = .123
     for P in (P1,P2,P3)
-        @test SolverStyle(InterpolationStyle(), approximationproblem(P1, 10)) == DualStyle()
+        @test SolverStyle(InterpolationStyle(), approximationproblem(P, 10)) == DualStyle()
         F = Fun(f, P, N)
         @test norm(F.(x)-f.(x),Inf)  < .005
         @test abs(F(t)-f(t)) < .0002
+    end
+end
+
+using BSplineExtension, Test
+@testset "Nd Basis platform approximation" begin
+
+    P1 = NdBSplinePlatform((3,3))
+    P2 = NdEpsBSplinePlatform((3,3))
+    P3 = NdCDBSplinePlatform((3,3))
+    f = (x,y) -> exp(cos(10pi*sqrt((x-.5)^2+(y-.5)^2)))
+
+    N = (100,100)
+    x = PeriodicEquispacedGrid(3N[1], UnitInterval())^2
+    t = (.123,.203)
+    for P in (P1,P2,P3)
+        @test SolverStyle(FrameFun.ProductSamplingStyle(InterpolationStyle(),InterpolationStyle()), approximationproblem(P, (10,10))) ==
+            FrameFun.ProductSolverStyle(DualStyle(),DualStyle())
+        F = Fun(f, P, N)
+        @test norm(F(x)-[f(xi...) for xi in x],Inf)  < .1
+        @test abs(F(t...)-f(t...)) < 1e-5
     end
 end
 
@@ -135,10 +155,26 @@ using Test, BSplineExtension
     modandsort = x->sort(mod.(x .- 1,5) .+ 1)
     for d in 1:4
         for dict in (BSplineTranslatesBasis(5,d), BSplineTranslatesBasis(10,d))
-            @test modandsort(nonzero_coefficients(dict, eps())) == modandsort(findall(evaluation_matrix(dict, eps())[:] .!= 0))
+            @test modandsort(nonzero_coefficients(dict, eps())[1]) == modandsort(findall(evaluation_matrix(dict, eps())[:] .!= 0))
             for t in .1:.1:.9
-                @test modandsort(nonzero_coefficients(dict, t-eps())) == modandsort(findall(evaluation_matrix(dict, t-eps())[:] .!= 0))
-                @test modandsort(nonzero_coefficients(dict, t+eps())) == modandsort(findall(evaluation_matrix(dict, t+eps())[:] .!= 0))
+                @test modandsort(nonzero_coefficients(dict, t-eps())[1]) == modandsort(findall(evaluation_matrix(dict, t-eps())[:] .!= 0))
+                @test modandsort(nonzero_coefficients(dict, t+eps())[1]) == modandsort(findall(evaluation_matrix(dict, t+eps())[:] .!= 0))
+            end
+        end
+    end
+
+    modandsort2 = x->(sort(mod.(x[1] .- 1,5) .+ 1), sort(mod.(x[2] .- 1,5) .+ 1))
+    function getnonzeroindices(dict, x)
+        m = abs.(reshape(evaluation_matrix(dict, [x]),size(dict)))
+        modandsort(findall(sum(m;dims=2)[:] .!=0)), modandsort(findall(sum(m;dims=1)[:] .!=0))
+    end
+
+    for d1 in 1:4, d2 in 1:4
+        dict = dictionary(NdBSplinePlatform((d1,d2)),(5,5))
+        modandsort2(nonzero_coefficients(dict, (eps(),eps()))) == getnonzeroindices(dict, (eps(),eps()))
+        for t1 in .1:.1:.9, t2 in .1:.1:.9
+            for x in ((t1-eps(),t2-eps()),(t1+eps(),t2-eps()),(t1-eps(),t2+eps()),(t1+eps(),t2+eps()))
+                @test modandsort2(nonzero_coefficients(dict, x)) == getnonzeroindices(dict, x)
             end
         end
     end
@@ -179,9 +215,9 @@ using BSplineExtension: coefficient_indices_of_overlapping_elements
 end
 
 using BSplineExtension, Test
-using BSplineExtension.FrameFun: ExtensionFramePlatform
 using BSplineExtension: nonzero_rows, nonzero_cols
 @testset "ExtensionFramePlatform, nonzero_rows, nonzero_cols" begin
+    # 1D nonzero_cols
     for d in (1,2,3,4)
         P = ExtensionFramePlatform(EpsBSplinePlatform(d), 0.0..0.5)
         N = 100
@@ -194,45 +230,87 @@ using BSplineExtension: nonzero_rows, nonzero_cols
         end
     end
 
+    # 1D nonzero_rows
     P = FrameFun.ExtensionFramePlatform(CDBSplinePlatform(), 0.0..0.5)
     N = 100
     M = plungeoperator(P,N;L=4N)*AZ_A(P,N;L=4N);size(M)
     @test findall(nonzero_rows(Matrix(M),nonzero_tol=1e-10))[:] ==
         findall(sum(abs.(Matrix(M));dims=2)[:] .> 1e-10)
+
+    # 2D nonzero_cols
+    P = ExtensionFramePlatform(NdEpsBSplinePlatform((3,3)),(0.0..0.5)^2)
+    N = (10,10)
+    A = Matrix(AZ_A(P,N))
+    Zt = Matrix(AZ_Zt(P,N))
+    gt = nonzero_cols(basis(dictionary(P,N)), supergrid(sampling_grid(P,N)), (0.0..0.5)^2)
+    n = findall(reshape(sum(abs.(Matrix(A*Zt*A-A)); dims=1),N) .> 1e-10)
+    for ni in n
+        @test ni ∈ gt
+    end
+
+    # 2D nonzero_rows
+    P = ExtensionFramePlatform(NdCDBSplinePlatform((3,3)),(0.0..0.5)^2)
+    N = (10,10)
+    M = plungeoperator(P,N)*AZ_A(P,N);size(M)
+    @test findall(nonzero_rows(Matrix(M),nonzero_tol=1e-10))[:] ==
+        findall(sum(abs.(Matrix(M));dims=2)[:] .> 1e-10)
 end
 
 using BSplineExtension, Test
-using BSplineExtension.FrameFun: ExtensionFramePlatform
 using BSplineExtension: BSplineExtensionSolver
 @testset "ExtensionFramePlatform, BSplineExtensionSolver approximation power" begin
-        for d in 1:5
-            for PLATFORM in (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
-                P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); N = 30
-                plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N)
-                M = plunge*A; S = BSplineExtensionSolver(M;crop=true)
-                b = samplingoperator(P,N;L=4N)*exp
-                x1 = S*plunge*b
-                x2 = Zt*(b-A*x1)
-                F = DictFun(dictionary(P,N), x1 + x2)
-                @test abserror(exp, F) < 1e-4
-            end
+    for d in 1:5
+        for PLATFORM in (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
+            P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); N = 30
+            plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N)
+            M = plunge*A; S = BSplineExtensionSolver(M;crop=true)
+            b = samplingoperator(P,N;L=4N)*exp
+            x1 = S*plunge*b
+            x2 = Zt*(b-A*x1)
+            F = DictFun(dictionary(P,N), x1 + x2)
+            @test abserror(exp, F) < 1e-4
         end
+    end
 end
 
 using BSplineExtension, Test
-using BSplineExtension.FrameFun: ExtensionFramePlatform
+using BSplineExtension: BSplineExtensionSolver
+@testset "ExtensionFramePlatform, BSplineExtensionSolver approximation power, Nd" begin
+    f = (x,y)->exp(x*y)
+    for d1 in 1:2, d2 in 1:2, PLATFORM in (NdEpsBSplinePlatform, NdBSplinePlatform, NdCDBSplinePlatform), N1 in (10,15), N2 in (10,15)
+        P = ExtensionFramePlatform(PLATFORM((d1,d2)), (0.0..0.5)^2); N = (N1,N2)
+        plunge = plungeoperator(P,N); A = AZ_A(P,N); Zt = AZ_Zt(P,N)
+        M = plunge*A; S = BSplineExtensionSolver(M;crop=true)
+        b = samplingoperator(P,N)*f
+        x1 = S*plunge*b
+        x2 = Zt*(b-A*x1)
+        F = DictFun(dictionary(P,N), x1 + x2)
+        @test abserror(f, F) < 1e-4
+    end
+end
+
+using BSplineExtension, Test
 using BSplineExtension: BSplineExtensionSolver
 @testset "ExtensionFramePlatform, BSplineExtensionSolver AZ approximation power" begin
     for d in 1:5
         for PLATFORM in (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
-            P = ExtensionFramePlatform(EpsBSplinePlatform(1), 0.0..0.5); N = 30
+            P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); N = 30
             F = Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver, L=4N, crop=true)
             @test abserror(exp, F) < 1e-4
         end
     end
 end
 
-
+using BSplineExtension, Test
+using BSplineExtension: BSplineExtensionSolver
+@testset "ExtensionFramePlatform, BSplineExtensionSolver AZ approximation power, Nd" begin
+    f = (x,y)->exp(x*y)
+    for d in 1:5, PLATFORM in (NdEpsBSplinePlatform, NdBSplinePlatform, NdCDBSplinePlatform)
+        P = ExtensionFramePlatform(PLATFORM((d,d)), (0.0..0.5)^2); N = (30,30)
+        F = Fun(f, P, N;REG=BSplineExtension.BSplineExtensionSolver, crop=true)
+        @test abserror(f, F) < 1e-4
+    end
+end
 
 using BSplineExtension, Test
 @testset "ExtensionFramePlatform, BSplineExtensionSolver truncated size" begin

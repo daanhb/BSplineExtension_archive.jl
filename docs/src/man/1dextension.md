@@ -46,7 +46,7 @@ For the platforms above these operators are readily available using `AZ_A` and `
 julia> N = 200;
 
 
-julia> AZ_A(P1,N;L=4N)
+julia> AZ_A(P1,N)
 Operator D * R[1:401 → 𝕀] * M
 
 R	:	Restriction of coefficients to subset
@@ -54,17 +54,17 @@ M	:	Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
-julia> AZ_Zt(P1,N;L=4N)
-Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
+julia> AZ_Zt(P1,N)
+Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
 
-M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
-M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
+M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
+M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
 E	:	Extending coefficients by zero padding
 D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
-julia> AZ_Zt(P2,N;L=4N)
-Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
+julia> AZ_Zt(P2,N)
+Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
 
 M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
 M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
@@ -73,7 +73,7 @@ D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 
-julia> AZ_Zt(P3,N;L=4N)
+julia> AZ_Zt(P3,N)
 Operator M * E[ 𝕀 → 1:401] * D
 
 M	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}

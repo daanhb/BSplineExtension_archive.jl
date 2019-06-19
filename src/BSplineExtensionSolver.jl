@@ -35,7 +35,7 @@ The easiest use of `BSplineExtensionSolver` is providing it just with (AZ'A-A)
 ```jldocs
 julia> P = ExtensionFramePlatform(CDBSplinePlatform(), 0.0..0.5); N = 30;
 
-julia> plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N);
+julia> plunge = plungeoperator(P,N); A = AZ_A(P,N); Zt = AZ_Zt(P,N);
 
 julia> M = plunge*A;
 
@@ -44,7 +44,7 @@ BSplineExtensionSolver
 
 
 
-julia> b = samplingoperator(P,N;L=4N)*exp;
+julia> b = samplingoperator(P,N)*exp;
 
 julia> x1 = S*plunge*b;
 
@@ -61,7 +61,7 @@ More often it will be used as a parameter for `FrameFun` functionality. The foll
 ```jldocs
 julia> P = ExtensionFramePlatform(CDBSplinePlatform(), 0.0..0.5); N = 30;
 
-julia> Fun(exp, P, N; L=4N, REG = BSplineExtensionSolver)
+julia> Fun(exp, P, N; REG = BSplineExtensionSolver)
 DictFun{Float64,Float64}(A 1-dimensional Expansion with 30 degrees of freedom.
 Basis: Extension frame
 )
@@ -76,6 +76,9 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
 
     dict_scratch
     grid_scratch
+
+    src_linear  ::  Vector{T}
+    dest_linear ::  Vector{T}
 
     function BSplineExtensionSolver(M::DictionaryOperator{T};
             crop=true, crop_tol=0, directsolver=:qr, verbose=false, options...) where T
@@ -96,10 +99,11 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
         if crop
             verbose && println("Restricting rows...")
 
-            nz_rows = findall(nonzero_rows(m;nonzero_tol=crop_tol))
+            nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
+            I = LinearIndices(size(dest(M)))[nz_rows]
             if length(nz_rows) < size(M,1)
-                m = m[nz_rows,:]
-                grid_resop = restriction_operator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[nz_rows]))
+                m = m[I,:]
+                grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
 
                 verbose && println("Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
             else
@@ -110,7 +114,9 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
         else
             grid_resop = IdentityOperator(dest(M))
         end
-        new{T}(M, grid_resop, dict_resop', FrameFun.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...), zeros(length(nonzero_cols)), zeros(dest(grid_resop)))
+        new{T}(M, grid_resop, dict_resop', FrameFun.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
+            zeros(length(nonzero_cols)), zeros(dest(grid_resop)),
+            zeros(T, length(dest(M))), zeros(T, length(src(M))))
     end
 end
 
@@ -124,6 +130,6 @@ truncated_size(op::BSplineExtensionSolver) = size(inv(op.sol))
 
 function FrameFun.BasisFunctions.linearized_apply!(op::BSplineExtensionSolver, dest::Vector, src::Vector)
     FrameFun.BasisFunctions.apply!(op.grid_res, op.grid_scratch, src)
-    FrameFun.BasisFunctions.linearized_apply!(op.sol, op.dict_scratch, op.grid_scratch)
+    FrameFun.BasisFunctions.apply!(op.sol, op.dict_scratch, op.grid_scratch)
     FrameFun.BasisFunctions.apply!(op.dict_ext, dest, op.dict_scratch)
 end
