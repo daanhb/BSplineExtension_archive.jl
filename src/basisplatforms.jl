@@ -2,11 +2,9 @@ abstract type AbstractBSplinePlatform{T,D} <: BasisPlatform end
 dictionary(p::AbstractBSplinePlatform{T,D}, n) where {T,D} = BSplineTranslatesBasis{T,D}(n)
 first_parameters(p::AbstractBSplinePlatform) = (8,8)
 SolverStyle(p::AbstractBSplinePlatform, ::SamplingStyle) = DualStyle()
-oversampling_grid(platform::AbstractBSplinePlatform, param::Int, L::Int; dict=dictionary(platform, param), options...) =
-    interpolation_grid(resize(dict, length(dict)*round(Int, L/length(dict))))
-deduce_samplingparameter(ss::OversamplingStyle, platform::AbstractBSplinePlatform, param;
-        oversamplingfactor = 2, dict=dictionary(platform, param), L=round(Int, oversamplingfactor*length(dict)), options...) =
-    length(dict)*round(Int, L/length(dict))
+correct_sampling_parameter(::AbstractBSplinePlatform, param, L; options...) = error()
+correct_sampling_parameter(::AbstractBSplinePlatform, param::Int, L::Int; options...) =
+    (round(Int, L/param) * param)
 
 
 export BSplinePlatform

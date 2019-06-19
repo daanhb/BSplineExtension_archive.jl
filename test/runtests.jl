@@ -3,8 +3,6 @@ using LinearAlgebra, BSplineExtension, Test
 using BSplineExtension.FrameFun: approximationproblem
 
 @testset "BSpline platforms, dictionaries" begin
-
-
     P = BSplinePlatform()
     B = dictionary(P,10)
 
@@ -43,6 +41,69 @@ using BSplineExtension.FrameFun: approximationproblem
     @test 20==length(sampling_grid(P,10; oversamplingfactor=1.6,samplingstyle=OversamplingStyle()))
     @test 20==FrameFun.samplingparameter(P,10; oversamplingfactor=1.6,samplingstyle=OversamplingStyle())
 
+end
+
+
+using BSplineExtension, Test
+@testset "Nd BSpline platforms, dictionaries" begin
+    P = NdBSplinePlatform((1,3))
+    B = dictionary(P,(10,10))
+
+    @test FrameFun.default_discretemeasure(OversamplingStyle(),B,(11,11)) ≈ discretemeasure(PeriodicEquispacedGrid(11,0,1)^2)
+
+    d1 = dictionary(P,(10,10))
+    d2 = azdual_dict(P,(10,10))
+
+    g1 = mixedgramoperator(d1, d2)
+    sampling_grid(P,(10,10))
+    g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,(10,10))))
+    all(isa.(elements(g1), CirculantOperator))
+    @test all(isa.(elements(g1), CirculantOperator))
+    @test all(isa.(elements(g2), CirculantOperator))
+    @test g2 ≈ IdentityOperator(B)
+
+    P = NdEpsBSplinePlatform((1,3))
+    g = sampling_grid(P,10)
+    d1 = dictionary(P,30)
+    d2 = azdual_dict(P,30;threshold=1e-4)
+    g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,30)))
+    @test norm(IdentityOperator(d1)-g2) < 1e-3
+
+
+    P = NdCDBSplinePlatform((1,3))
+    d1 = dictionary(P,20)
+    d2 = azdual_dict(P,20)
+    g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,20)))
+    @test IdentityOperator(d1)≈g2
+end
+
+using Test, BSplineExtension
+@testset "samplng parameter, oversampling" begin
+    P = BSplinePlatform()
+    for N in 1:100
+        @test divrem(samplingparameter(P, N; samplingstyle=OversamplingStyle(), oversamplingfactor=pi) ,N)[2] == 0
+    end
+
+    P = ExtensionFramePlatform(BSplinePlatform(), 0.0..0.5)
+    for N in 1:100
+        @test divrem(samplingparameter(P, N; samplingstyle=OversamplingStyle(), oversamplingfactor=pi) ,N)[2] == 0
+    end
+
+    P = NdBSplinePlatform((3,3))
+    for N in 1:100
+        @test (0,0) == map(x->divrem(x, N)[2], samplingparameter(P, (N,N); samplingstyle=ProductSamplingStyle(OversamplingStyle(),OversamplingStyle()), oversamplingfactor=pi))
+    end
+
+    P = ExtensionFramePlatform(NdBSplinePlatform((3,3)), (0.0..0.5)^2)
+    for N in 5:100
+        @test (0,0) == map(x->divrem(x, N)[2], samplingparameter(P, (N,N); oversamplingfactor=pi))
+    end
+
+
+    P = ExtensionFramePlatform(NdBSplinePlatform((1,3)),(0.0..0.5)^2)
+    N = 10
+    @test operator(basis(azdual_dict(P,(N,N);L=(4N,4N))))≈
+        operator(basis(azdual_dict(P,(N,N),oversamplingfactor=4)))
 end
 
 using Test, BSplineExtension
@@ -232,7 +293,7 @@ end
 
 
 using Test, BSplineExtension, Statistics
-@testset "1d spline extension approximation, errors, and timings" begin 
+@testset "1d spline extension approximation, errors, and timings" begin
     PLATFORMs = (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform)
         Ns1 = [1<<k for k in 4:10]
         Ns2 = [1<<k for k in 9:16]

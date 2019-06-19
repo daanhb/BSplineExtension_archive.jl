@@ -4,7 +4,7 @@ using Reexport, LinearAlgebra, StaticArrays
 
 using FrameFun: BasisPlatform, FramePlatform, ExtensionFramePlatform, Measure
 import FrameFun: dictionary, first_parameters, SolverStyle, measure, azdual_dict, SamplingStyle,
-    SolverStyle, oversampling_grid, deduce_samplingparameter
+    SolverStyle, correct_sampling_parameter
 
 export ExtensionFramePlatform
 
@@ -19,6 +19,8 @@ function nonzero_coefficients(dict::CompactTranslatesDict.DiffPeriodicBSplineBas
 end
 
 include("BSplineExtensionSolver.jl")
+
+include("ndplatforms.jl")
 
 
 end
