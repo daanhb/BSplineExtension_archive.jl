@@ -24,7 +24,8 @@ makedocs(sitename="BSplineExtension.jl",
     pages = [
         "Home" => "index.md",
         "Manual" => ["Basis platform" => "man/basisplatform.md",
-                    "1D extension platform" => "man/1dextension.md"]
+                    "1D extension platform" => "man/1dextension.md",
+                    "ND extension platform" => "man/ndbsplineextension.md"]
         ],
     doctest=:fix
 )

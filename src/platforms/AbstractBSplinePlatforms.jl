@@ -1,6 +1,5 @@
 abstract type AbstractBSplinePlatform{T,D} <: BasisPlatform end
 dictionary(p::AbstractBSplinePlatform{T,D}, n::Int) where {T,D} = BSplineTranslatesBasis{T,D}(n)
-first_parameters(p::AbstractBSplinePlatform) = (8,8)
 SolverStyle(p::AbstractBSplinePlatform, ::SamplingStyle) = DualStyle()
 correct_sampling_parameter(::AbstractBSplinePlatform, param, L; options...) = error()
 correct_sampling_parameter(::AbstractBSplinePlatform, param::Int, L::Int; options...) =
@@ -111,7 +110,7 @@ end
 
 EpsBSplinePlatform(degree::Int=3) = EpsBSplinePlatform{Float64,degree}()
 
-function azdual_dict(sstyle::SamplingStyle, platform::EpsBSplinePlatform, param, L, measure::Measure;
+function dualdictionary(platform::EpsBSplinePlatform, param, measure::Measure;
         threshold=nothing, options...)
     dual = gramdual(dictionary(platform, param), measure;options...)
     op = BasisFunctions.operator(dual)
@@ -187,7 +186,10 @@ CDBSplinePlatform(degree::Int=3) = CDBSplinePlatform{Float64,degree}()
 SamplingStyle(::CDBSplinePlatform) = OversamplingStyle()
 include("DiscreteBSplineDicts.jl")
 
-function azdual_dict(sstyle::SamplingStyle, platform::CDBSplinePlatform, param, L, measure::UniformDiracCombMeasure;
+dualdictionary(platform::CDBSplinePlatform, param, measure::Measure; options...) =
+    error("No azdual_dict for `CDBSplinePlatform` and $(typeof(measure))")
+
+function dualdictionary(platform::CDBSplinePlatform, param, measure::UniformDiracCombMeasure;
         options...)
     dict = dictionary(platform, param)
     g = grid(measure)

@@ -81,7 +81,8 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
     dest_linear ::  Vector{T}
 
     function BSplineExtensionSolver(M::DictionaryOperator{T};
-            crop=true, crop_tol=0, directsolver=:qr, verbose=false, options...) where T
+            crop=true, crop_tol=0, directsolver=:qr, verbose=false, lazy=false, options...) where T
+
         nonzero_cols = BSplineExtension.nonzero_cols(basis(src(M)), supergrid(FrameFun.BasisFunctions.grid(dest(M))), support(src(M)))
         dict_resop = IndexRestrictionOperator(src(M), src(M)[nonzero_cols], nonzero_cols)
 
@@ -90,6 +91,7 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
         s = zeros(src(M))
         d = zeros(dest(M))
         m = Array{eltype(M)}(undef, size(M,1), length(nonzero_cols))
+        
         for (j,i) in enumerate(nonzero_cols )
             s[i] = 1
             FrameFun.BasisFunctions.apply!(M, d, s)
@@ -102,7 +104,7 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
             nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
             I = LinearIndices(size(dest(M)))[nz_rows]
             if length(nz_rows) < size(M,1)
-                m = m[I,:]
+                m = view(m,I,:)
                 grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
 
                 verbose && println("Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
@@ -114,7 +116,7 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
         else
             grid_resop = IdentityOperator(dest(M))
         end
-        new{T}(M, grid_resop, dict_resop', FrameFun.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
+        new{T}(M, grid_resop, dict_resop', lazy ? FrameFun.BasisFunctions.GenericSolverOperator(ArrayOperator(m), ArrayOperator(m')) : FrameFun.FrameFunInterface.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
             zeros(length(nonzero_cols)), zeros(dest(grid_resop)),
             zeros(T, length(dest(M))), zeros(T, length(src(M))))
     end

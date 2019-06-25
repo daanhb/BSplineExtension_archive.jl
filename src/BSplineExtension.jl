@@ -2,15 +2,14 @@ module BSplineExtension
 using Reexport, LinearAlgebra, StaticArrays
 @reexport using CompactTranslatesDict, FrameFun, DomainSets
 
-using FrameFun: BasisPlatform, FramePlatform, ExtensionFramePlatform, Measure
-import FrameFun: dictionary, first_parameters, SolverStyle, measure, azdual_dict, SamplingStyle,
-    SolverStyle, correct_sampling_parameter
-
-export ExtensionFramePlatform
+using FrameFun.FrameFunInterface: directsolver
+import FrameFun: dictionary
+import FrameFun.Platforms: dictionary, SolverStyle, measure, SamplingStyle, dualdictionary
+import FrameFun.FrameFunInterface: correct_sampling_parameter
 
 include("plots.jl")
 
-include("basisplatforms.jl")
+include("platforms/AbstractBSplinePlatforms.jl")
 
 function nonzero_coefficients(dict::CompactTranslatesDict.DiffPeriodicBSplineBasis, x::Real)
     w = (degree(dict)+1)
@@ -20,7 +19,7 @@ end
 
 include("BSplineExtensionSolver.jl")
 
-include("ndplatforms.jl")
+include("platforms/ndplatforms.jl")
 
 
 end

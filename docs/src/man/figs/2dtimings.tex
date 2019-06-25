@@ -1,0 +1,173 @@
+\RequirePackage{luatex85}
+\documentclass[tikz]{standalone}
+% Default preamble
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{statistics}
+\usepgfplotslibrary{dateplot}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={BSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.008713771  \\
+            576.0  0.059798791  \\
+            2304.0  0.31658391  \\
+            9216.0  2.529671528  \\
+        }
+        ;
+    \addlegendentry {m=1}
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.012863826  \\
+            576.0  0.094792239  \\
+            2304.0  1.248268211  \\
+            9216.0  5.704479962  \\
+        }
+        ;
+    \addlegendentry {m=2}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.018481507  \\
+            576.0  0.134596625  \\
+            2304.0  1.584993723  \\
+            9216.0  21.620065736  \\
+        }
+        ;
+    \addlegendentry {m=3}
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.022826653  \\
+            576.0  0.211909941  \\
+            2304.0  2.064737716  \\
+            9216.0  30.218713137  \\
+        }
+        ;
+    \addlegendentry {m=4}
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.0864  \\
+            576.0  0.6912  \\
+            2304.0  5.5296  \\
+            9216.0  44.2368  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^\frac{3}{2})$}
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={EpsBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.009664494  \\
+            576.0  0.101984147  \\
+            2304.0  0.711612348  \\
+            9216.0  9.594315926  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.012658507  \\
+            576.0  0.096622507  \\
+            2304.0  1.139870001  \\
+            9216.0  15.566567748  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.016950792  \\
+            576.0  0.125712853  \\
+            2304.0  1.615154017  \\
+            9216.0  21.574725492  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.024560462  \\
+            576.0  0.210591579  \\
+            2304.0  2.059683764  \\
+            9216.0  30.304503836  \\
+        }
+        ;
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.0864  \\
+            576.0  0.6912  \\
+            2304.0  5.5296  \\
+            9216.0  44.2368  \\
+        }
+        ;
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={CDBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.005780121  \\
+            576.0  0.067493942  \\
+            2304.0  0.152131629  \\
+            9216.0  1.247142407  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.009588212  \\
+            576.0  0.04733304  \\
+            2304.0  0.402788935  \\
+            9216.0  2.478093474  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.014300377  \\
+            576.0  0.06759335  \\
+            2304.0  0.492272428  \\
+            9216.0  4.154295275  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.018335403  \\
+            576.0  0.127941138  \\
+            2304.0  0.802779442  \\
+            9216.0  6.395975186  \\
+        }
+        ;
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.0864  \\
+            576.0  0.6912  \\
+            2304.0  5.5296  \\
+            9216.0  44.2368  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
+\end{document}

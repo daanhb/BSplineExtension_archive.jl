@@ -3,8 +3,8 @@
 ```@setup 1dframe
 using PGFPlotsX, BSplineExtension, DomainSets, LaTeXStrings
 P1 = ExtensionFramePlatform(BSplinePlatform(),0.0..0.5)
-P1 = ExtensionFramePlatform(EpsBSplinePlatform(),0.0..0.5)
-P1 = ExtensionFramePlatform(CDBSplinePlatform(),0.0..0.5)
+P2 = ExtensionFramePlatform(EpsBSplinePlatform(),0.0..0.5)
+P3 = ExtensionFramePlatform(CDBSplinePlatform(),0.0..0.5)
 savefigs = (figname, obj) -> begin
     pgfsave(figname * ".pdf", obj)
     run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
@@ -55,16 +55,16 @@ D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 julia> AZ_Zt(P1,N)
-Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
+Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
 
-M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
-M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
 E	:	Extending coefficients by zero padding
 D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 julia> AZ_Zt(P2,N)
-Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
+Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
 
 M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
 M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}

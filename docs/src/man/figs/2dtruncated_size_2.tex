@@ -1,0 +1,297 @@
+\RequirePackage{luatex85}
+\documentclass[tikz]{standalone}
+% Default preamble
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{statistics}
+\usepgfplotslibrary{dateplot}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={BSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addlegendentry {m=1(1.0e-16)}
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  8968  \\
+            9216  24595  \\
+        }
+        ;
+    \addlegendentry {m=1(1.0e-5)}
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addlegendentry {m=2(1.0e-16)}
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  32539  \\
+        }
+        ;
+    \addlegendentry {m=2(1.0e-5)}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addlegendentry {m=3(1.0e-16)}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  35889  \\
+        }
+        ;
+    \addlegendentry {m=3(1.0e-5)}
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addlegendentry {m=4(1.0e-16)}
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36764  \\
+        }
+        ;
+    \addlegendentry {m=4(1.0e-5)}
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  6000  \\
+            576  12000  \\
+            2304  24000  \\
+            9216  48000  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^{\frac{1}{2}})$}
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={EpsBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36863  \\
+        }
+        ;
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  8968  \\
+            9216  24595  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  32539  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  35889  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36864  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  9409  \\
+            9216  36764  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  6000  \\
+            576  12000  \\
+            2304  24000  \\
+            9216  48000  \\
+        }
+        ;
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={CDBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  586  \\
+            576  1679  \\
+            2304  3480  \\
+            9216  8303  \\
+        }
+        ;
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  336  \\
+            576  935  \\
+            2304  1488  \\
+            9216  4103  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2247  \\
+            2304  6465  \\
+            9216  14364  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  600  \\
+            576  1679  \\
+            2304  3480  \\
+            9216  8303  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  7728  \\
+            9216  19703  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2135  \\
+            2304  5184  \\
+            9216  12215  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2304  \\
+            2304  8880  \\
+            9216  22940  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144  625  \\
+            576  2300  \\
+            2304  6600  \\
+            9216  15839  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  6000  \\
+            576  12000  \\
+            2304  24000  \\
+            9216  48000  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
+\end{document}

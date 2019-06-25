@@ -1,0 +1,173 @@
+\RequirePackage{luatex85}
+\documentclass[tikz]{standalone}
+% Default preamble
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{statistics}
+\usepgfplotslibrary{dateplot}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xmode={log}, ymode={log}, legend pos={north west}, xlabel={N}, title={BSplinePlatform}]
+    \addplot+[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  48  \\
+            576  88  \\
+            2304  192  \\
+            9216  376  \\
+        }
+        ;
+    \addlegendentry {m=1}
+    \addplot+[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  72  \\
+            576  144  \\
+            2304  288  \\
+            9216  576  \\
+        }
+        ;
+    \addlegendentry {m=2}
+    \addplot+[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  96  \\
+            576  176  \\
+            2304  384  \\
+            9216  752  \\
+        }
+        ;
+    \addlegendentry {m=3}
+    \addplot+[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  120  \\
+            576  240  \\
+            2304  480  \\
+            9216  960  \\
+        }
+        ;
+    \addlegendentry {m=4}
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  36  \\
+            576  72  \\
+            2304  144  \\
+            9216  288  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^{\frac{1}{2}})$}
+    \nextgroupplot[xmode={log}, ymode={log}, legend pos={north west}, xlabel={N}, title={EpsBSplinePlatform}]
+    \addplot+[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  48  \\
+            576  88  \\
+            2304  192  \\
+            9216  376  \\
+        }
+        ;
+    \addplot+[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  72  \\
+            576  144  \\
+            2304  288  \\
+            9216  576  \\
+        }
+        ;
+    \addplot+[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  96  \\
+            576  176  \\
+            2304  384  \\
+            9216  752  \\
+        }
+        ;
+    \addplot+[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  120  \\
+            576  240  \\
+            2304  480  \\
+            9216  960  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  36  \\
+            576  72  \\
+            2304  144  \\
+            9216  288  \\
+        }
+        ;
+    \nextgroupplot[xmode={log}, ymode={log}, legend pos={north west}, xlabel={N}, title={CDBSplinePlatform}]
+    \addplot+[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  48  \\
+            576  88  \\
+            2304  192  \\
+            9216  376  \\
+        }
+        ;
+    \addplot+[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  72  \\
+            576  144  \\
+            2304  288  \\
+            9216  576  \\
+        }
+        ;
+    \addplot+[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  96  \\
+            576  176  \\
+            2304  384  \\
+            9216  752  \\
+        }
+        ;
+    \addplot+[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144  120  \\
+            576  240  \\
+            2304  480  \\
+            9216  960  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            144  36  \\
+            576  72  \\
+            2304  144  \\
+            9216  288  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
+\end{document}
