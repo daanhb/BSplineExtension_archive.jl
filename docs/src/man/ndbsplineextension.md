@@ -6,9 +6,9 @@ P2 = ExtensionFramePlatform(NdEpsBSplinePlatform((3,3)),(0.0..0.5)^2)
 P3 = ExtensionFramePlatform(NdCDBSplinePlatform((3,3)),(0.0..0.5)^2)
 savefigs = (figname, obj) -> begin
     pgfsave(figname * ".pdf", obj)
-    run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     pgfsave(figname * ".tex", obj);
     pgfsave(figname * ".tikz", obj;include_preamble=false);
+    run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     return nothing
 end
 ```

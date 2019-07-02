@@ -7,9 +7,9 @@ P2 = ExtensionFramePlatform(EpsBSplinePlatform(),0.0..0.5)
 P3 = ExtensionFramePlatform(CDBSplinePlatform(),0.0..0.5)
 savefigs = (figname, obj) -> begin
     pgfsave(figname * ".pdf", obj)
-    run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     pgfsave(figname * ".tex", obj);
     pgfsave(figname * ".tikz", obj;include_preamble=false);
+    run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     return nothing
 end
 ```
