@@ -19,6 +19,7 @@ savefigs = (figname, obj) -> begin
     pgfsave(figname * ".pdf", obj)
     run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     pgfsave(figname * ".tex", obj);
+    pgfsave(figname * ".tikz", obj;include_preamble=false);
     return nothing
 end
 ```
@@ -198,7 +199,7 @@ F3 = Fun(f, P3, N)
 savefigs("basis", ans) # hide
 ```
 
-[\[.pdf\]](basis.pdf), [\[generated .tex\]](basis.tex)
+[\[.pdf\]](basis.pdf), [\[generated .tex\]](basis.tex), [\[generated .tikz\]](basis.tikz)
 
 ![](basis.svg)
 
@@ -225,7 +226,7 @@ end
 savefigs("convergence_basis", ans) # hide
 ```
 
-[\[.pdf\]](convergence_basis.pdf), [\[generated .tex\]](convergence_basis.tex)
+[\[.pdf\]](convergence_basis.pdf), [\[generated .tex\]](convergence_basis.tex), [\[generated .tikz\]](convergence_basis.tikz)
 
 ![](convergence_basis.svg)
 

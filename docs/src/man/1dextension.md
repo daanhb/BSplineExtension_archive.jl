@@ -9,6 +9,7 @@ savefigs = (figname, obj) -> begin
     pgfsave(figname * ".pdf", obj)
     run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
     pgfsave(figname * ".tex", obj);
+    pgfsave(figname * ".tikz", obj;include_preamble=false);
     return nothing
 end
 ```
@@ -135,7 +136,7 @@ end # hide
 savefigs("truncated_size_1", ans) # hide
 ```
 
-[\[.pdf\]](truncated_size_1.pdf), [\[generated .tex\]](truncated_size_1.tex)
+[\[.pdf\]](truncated_size_1.pdf), [\[generated .tex\]](truncated_size_1.tex), [\[generated .tikz\]](truncated_size_1.tikz)
 
 ![](truncated_size_1.svg)
 
@@ -166,7 +167,7 @@ end # hide
 savefigs("truncated_size_2", ans) # hide
 ```
 
-[\[.pdf\]](truncated_size_2.pdf), [\[generated .tex\]](truncated_size_2.tex)
+[\[.pdf\]](truncated_size_2.pdf), [\[generated .tex\]](truncated_size_2.tex), [\[generated .tikz\]](truncated_size_2.tikz)
 
 ![](truncated_size_2.svg)
 
@@ -211,7 +212,7 @@ end # hide
 savefigs("1derrors", ans) # hide
 ```
 
-[\[.pdf\]](1derrors.pdf), [\[generated .tex\]](1derrors.tex)
+[\[.pdf\]](1derrors.pdf), [\[generated .tex\]](1derrors.tex), [\[generated .tikz\]](1derrors.tikz)
 
 ![](1derrors.svg)
 ## Timings
@@ -241,7 +242,7 @@ end # hide
 savefigs("1dtimings", ans) # hide
 ```
 
-[\[.pdf\]](1dtimings.pdf), [\[generated .tex\]](1dtimings.tex)
+[\[.pdf\]](1dtimings.pdf), [\[generated .tex\]](1dtimings.tex), [\[generated .tikz\]](1dtimings.tikz)
 
 ![](1dtimings.svg)
 

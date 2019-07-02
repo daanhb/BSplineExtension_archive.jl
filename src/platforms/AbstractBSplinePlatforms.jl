@@ -127,6 +127,7 @@ function dualdictionary(platform::EpsBSplinePlatform, param, measure::Measure;
     if bw[1] == nothing
         return dual
     end
+    bw = bw[1]-1,bw[2]+1
     a = [column[bw[2]:end];column[1:bw[1]]]
     # Create bandlimited operator (which is also circulant)
     op_replace = VerticalBandedOperator(src(op), dest(op), a, 1, -1+bw[2]-length(dual))
