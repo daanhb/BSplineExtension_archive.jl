@@ -1,13 +1,3 @@
-\documentclass[tikz]{standalone}
-% Default preamble
-\usepackage{pgfplots}
-\pgfplotsset{compat=newest}
-\usepgfplotslibrary{groupplots}
-\usepgfplotslibrary{polar}
-\usepgfplotslibrary{smithchart}
-\usepgfplotslibrary{statistics}
-\usepgfplotslibrary{dateplot}
-\begin{document}
 \begin{tikzpicture}
 \begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
     \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={BSplinePlatform}]
@@ -151,4 +141,3 @@
         ;
 \end{groupplot}
 \end{tikzpicture}
-\end{document}
