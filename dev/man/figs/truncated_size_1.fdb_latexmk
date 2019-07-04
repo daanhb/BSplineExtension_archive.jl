@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1562250103 "truncated_size_1.tex" "truncated_size_1.pdf" "truncated_size_1" 1562250105
+["pdflatex"] 1562252350 "truncated_size_1.tex" "truncated_size_1.pdf" "truncated_size_1" 1562252351
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmex10.tfm" 1480098701 992 662f679a0b3d2d53c1b94050fdaa3f50 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm" 1480098701 1528 abec98dbc43e172678c11b3b9031252a ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi5.tfm" 1480098701 1508 3b32edd0d68f6498a5a375e78f9edc5e ""
@@ -190,9 +190,9 @@
   "/usr/share/texlive/texmf-dist/tex/luatex/luaotfload/luaotfload-characters.lua" 1485820867 1548690 99578c3eff8b68cae3da45a4a7cbfcf2 ""
   "/usr/share/texlive/texmf-dist/tex/luatex/luaotfload/luaotfload-glyphlist.lua" 1485820867 102422 bcf89e1441be9f4ad29c0cf3a076bcea ""
   "/var/lib/texmf/web2c/luatex/lualatex.fmt" 1543615724 1349082 ee2b768dfd8475c6077ab36d2b5d4dce ""
-  "truncated_size_1.aux" 1562250104 8 a94a2480d3289e625eea47cd1b285758 ""
-  "truncated_size_1.tex" 1562250103 6551 1b0ed3fbc10456d74673bd0ad45bb362 ""
+  "truncated_size_1.aux" 1562252351 8 a94a2480d3289e625eea47cd1b285758 ""
+  "truncated_size_1.tex" 1562252350 6551 1b0ed3fbc10456d74673bd0ad45bb362 ""
   (generated)
   "truncated_size_1.log"
-  "truncated_size_1.aux"
   "truncated_size_1.pdf"
+  "truncated_size_1.aux"
