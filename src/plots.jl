@@ -29,13 +29,6 @@ for plot in (:Plot, :PlotInc)
             $(plot)(options, plot_extension ? Expansion(basis(dictionary(F)),coefficients(F)) : expansion(F); opts...)
         end
 
-        $(plot)(f::Function, F::DictFun; opts...) =
-            $(plot)(Options(), f, F; opts...)
-        $(plot)(F::DictFun, f::Function; opts...) =
-            $(plot)(Options(), f, F)
-        $(plot)(F::DictFun, f::DictFun; opts...) =
-            $(plot)(Options(), f, F; opts...)
-
         $(plot)(options::Options, F::DictFun, f::Function; opts...) =
             $(_plot)(options, f, F; opts...)
         $(plot)(options::Options, f::Function, F::DictFun; opts...) =
@@ -44,9 +37,17 @@ for plot in (:Plot, :PlotInc)
             $(_plot)(options, f, F; opts...)
         function $(_plot)(options::Options, f::Function, F::DictFun; plot_extension=false, opts...)
             if plot_extension
-                $(plot)(options, Expansion(basis(F),coefficients(F)), f; opts...)
+                $(_plot)(options, f, Expansion(basis(F),coefficients(F)); opts...)
             else
-                $(plot)(options, expansion(F), f; opts...)
+                $(_plot)(options, f, expansion(F); opts...)
+            end
+        end
+
+        function $(_plot)(options::Options, f::DictFun, F::DictFun; plot_extension=false, opts...)
+            if plot_extension
+                $(_plot)(options, Expansion(basis(f),coefficients(f)), Expansion(basis(F),coefficients(F)); opts...)
+            else
+                $(_plot)(options, expansion(f), expansion(F); opts...)
             end
         end
 
@@ -72,7 +73,8 @@ for plot in (:Plot, :PlotInc)
         $(plot)(options::Options, f::Expansion, F::Expansion; opts...) =
             $(_plot)(options, f, F; opts...)
 
-        function $(_plot)(options::Options, f, F; plot_complex=false, n=200, opts...)
+
+        function $(_plot)(options::Options, f, F::Expansion; plot_complex=false, n=200, opts...)
             grid = plotgrid(dictionary(F), n)
             vals = abs.(f.(grid) - F.(grid))
             options = @pgf {options..., no_markers}
