@@ -1,10 +1,10 @@
-\RequirePackage{luatex85}
 \documentclass[tikz]{standalone}
 % Default preamble
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepgfplotslibrary{groupplots}
 \usepgfplotslibrary{polar}
+\usepgfplotslibrary{smithchart}
 \usepgfplotslibrary{statistics}
 \usepgfplotslibrary{dateplot}
 \begin{document}
@@ -226,7 +226,7 @@
             \\
             900  1155  \\
             1681  1728  \\
-            3025  2400  \\
+            3025  2289  \\
             5476  3135  \\
             10000  4305  \\
         }
@@ -246,11 +246,11 @@
         table[row sep={\\}]
         {
             \\
-            900  1920  \\
-            1681  2903  \\
-            3025  4288  \\
-            5476  6460  \\
-            10000  9112  \\
+            900  1891  \\
+            1681  2944  \\
+            3025  4321  \\
+            5476  5983  \\
+            10000  8518  \\
         }
         ;
     \addplot[color={red}, mark={square}, mark options={solid}, dashed]
@@ -258,8 +258,8 @@
         {
             \\
             900  1216  \\
-            1681  1819  \\
-            3025  2533  \\
+            1681  1540  \\
+            3025  2128  \\
             5476  3328  \\
             10000  4576  \\
         }
@@ -268,22 +268,22 @@
         table[row sep={\\}]
         {
             \\
-            900  2084  \\
-            1681  3352  \\
-            3025  5139  \\
-            5476  7783  \\
-            10000  10920  \\
+            900  2035  \\
+            1681  3300  \\
+            3025  4953  \\
+            5476  6969  \\
+            10000  9805  \\
         }
         ;
     \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
         table[row sep={\\}]
         {
             \\
-            900  1632  \\
-            1681  2475  \\
-            3025  3525  \\
-            5476  4800  \\
-            10000  6672  \\
+            900  1332  \\
+            1681  1995  \\
+            3025  2793  \\
+            5476  3708  \\
+            10000  5112  \\
         }
         ;
     \addplot[color={black}, mark={x}, mark options={solid}, solid]
@@ -291,21 +291,21 @@
         {
             \\
             900  2116  \\
-            1681  3819  \\
-            3025  6264  \\
-            5476  9408  \\
-            10000  13965  \\
+            1681  3744  \\
+            3025  5928  \\
+            5476  8823  \\
+            10000  13066  \\
         }
         ;
     \addplot[color={black}, mark={x}, mark options={solid}, dashed]
         table[row sep={\\}]
         {
             \\
-            900  1972  \\
-            1681  3115  \\
-            3025  4585  \\
-            5476  6460  \\
-            10000  9112  \\
+            900  1792  \\
+            1681  2548  \\
+            3025  3640  \\
+            5476  5488  \\
+            10000  7672  \\
         }
         ;
     \addplot[dashed, color={black}]
