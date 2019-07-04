@@ -1,5 +1,5 @@
 module BSplineExtension
-using Reexport, LinearAlgebra, StaticArrays
+using Reexport, LinearAlgebra, StaticArrays, GridArrays
 @reexport using CompactTranslatesDict, FrameFun, DomainSets
 
 using FrameFun.FrameFunInterface: directsolver
