@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.0.4 (TeX Live 2017/Debian)  (format=lualatex 2018.11.30)  4 JUL 2019 14:59
+This is LuaTeX, Version 1.0.4 (TeX Live 2017/Debian)  (format=lualatex 2018.11.30)  4 JUL 2019 16:52
  system commands enabled.
 **1dtimings.tex
 (./1dtimings.tex
@@ -35,7 +35,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 0.117 seconds
+luaotfload | main : initialization completed in 0.122 seconds
 Babel <3.18> and hyphenation patterns for 1 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/generic/luatex85/luatex85.sty
 Package: luatex85 2016/06/15 v1.4 pdftex aliases for luatex
@@ -656,13 +656,13 @@ de=log unsupported (yet).
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./1dtimings.aux))
 
 Here is how much of LuaTeX's memory you used:
- 23577 strings out of 494480
+ 23578 strings out of 494480
  100000,953878 words of node,token memory allocated
  353 words of node memory still in use:
    2 hlist, 1 vlist, 1 rule, 2 glue, 3 attribute, 45 glue_spec, 3 attribute_list
 , 1 write nodes
    avail lists: 2:5245,3:3970,4:61,5:29,6:259,7:1497,8:4,9:520,11:18
- 26908 multiletter control sequences out of 65536+600000
+ 26909 multiletter control sequences out of 65536+600000
  25 fonts using 1345103 bytes
  74i,18n,128p,731b,2402s stack positions out of 5000i,500n,10000p,200000b,100000s
 </usr/share/texmf/fonts/opentype/public/lm/lmroman10-regular.otf></usr/share/tex
@@ -671,7 +671,7 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
 lic/amsfonts/cm/cmsy7.pfb>
-Output written on 1dtimings.pdf (1 page, 49462 bytes).
+Output written on 1dtimings.pdf (1 page, 50396 bytes).
 
 PDF statistics: 38 PDF objects out of 1000 (max. 8388607)
  26 compressed objects within 1 object stream
