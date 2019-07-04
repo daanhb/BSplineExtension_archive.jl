@@ -13,7 +13,7 @@ for F in (F1,F2)
 
     Axis(F,f)
     Axis(F,F)
-    Axis(F,f)
+    Axis(f,F)
 end
 
 Plot(F3;plot_extension=true)
