@@ -209,8 +209,3 @@ function dualdictionary(platform::CDBSplinePlatform, param, measure::UniformDira
         end
     end
 end
-
-
-
-nonzero_azplungematrix_cols(platform::AbstractBSplinePlatform, param; dict=dictionary(platform, param), opts...) =
-    _nonzero_azplungematrix_cols(dict, sampling_grid(platform, param; options...); options...)

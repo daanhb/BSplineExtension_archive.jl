@@ -1,10 +1,4 @@
 
-nonzero_cols(platform::FrameFun.Platform, param; dict=dictionary(platform, param), options...) =
-    nonzero_cols(dict, sampling_grid(platform.basisplatform, param; dict=basis(dict), options...))
-
-nonzero_cols(dict::ExtensionFrame, gamma::AbstractGrid) =
-    nonzero_cols(basis(dict), gamma, support(dict))
-
 nonzero_cols(dict::Dictionary, gamma::AbstractGrid, domain::Domain) =
     coefficient_indices_of_overlapping_elements(dict, gamma[findall(GridArrays.boundary_mask(gamma, domain, true))])
 

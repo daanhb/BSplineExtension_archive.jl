@@ -27,3 +27,7 @@ end
 @testset "ND BSplineExtension" begin
     # include("Ndbsplineextension.jl")
 end
+
+@testset "PGFPlotsX" begin
+    include("test_plots.jl")
+end
