@@ -22,7 +22,7 @@ using BSplineExtension, Test
     d1 = dictionary(P,30)
     d2 = azdual_dict(P,30;threshold=1e-4)
     g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,30)))
-    @test norm(IdentityOperator(d1)-g2) < 1e-3
+    @test norm(IdentityOperator(d1)-g2) < 1e-2
 
     opts = (oversamplingfactor=4,)
     P = NdCDBSplinePlatform((1,3))

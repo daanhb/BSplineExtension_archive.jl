@@ -24,10 +24,10 @@ using BSplineExtension.FrameFun.ApproximationProblems: approximationproblem
     P = EpsBSplinePlatform()
     g = sampling_grid(P,10)
     d1 = dictionary(P,1000)
-    d2 = azdual_dict(P,1000;threshold=1e-4)
+    d2 = azdual_dict(P,1000;threshold=1e-6)
     @test (operator(d2) isa VerticalBandedOperator)
     g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,1000)))
-    @test norm(IdentityOperator(d1)-g2) < 1e-3
+    @test norm(IdentityOperator(d1)-g2) < 1e-4
 
 
     P = CDBSplinePlatform(5)
@@ -41,7 +41,6 @@ using BSplineExtension.FrameFun.ApproximationProblems: approximationproblem
     P = EpsBSplinePlatform()
     @test 20==length(sampling_grid(P,10; oversamplingfactor=1.6,samplingstyle=OversamplingStyle()))
     @test 20==FrameFun.samplingparameter(P,10; oversamplingfactor=1.6,samplingstyle=OversamplingStyle())
-
 end
 
 using Test, BSplineExtension

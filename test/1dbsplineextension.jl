@@ -21,19 +21,19 @@ using BSplineExtension, Test
     @test all(rowsizes[:,4,:,:] .== 10)
 
     # Test CDBSplinePlatform
-    @test all(18 .<= colsizes[3,1,:,1] .<= 23)
-    @test all(4 .<= colsizes[3,1,:,2] .<= 8)
-    @test all(36 .<= colsizes[3,2,:,1] .<= 43)
-    @test all(20 .<= colsizes[3,2,:,2] .<= 20)
-    @test all(41 .<= colsizes[3,4,:,2] .<= 44)
-    @test all(72 .<= colsizes[3,4,:,1][2:end] .<= 74)
+    @test all(18 .<= colsizes[3,1,:,1] .<= 31)
+    @test all(16 .<= colsizes[3,1,:,2] .<= 16)
+    @test all(41 .<= colsizes[3,2,:,1] .<= 51)
+    @test all(28 .<= colsizes[3,2,:,2] .<= 28)
+    @test all(41 .<= colsizes[3,4,:,2] .<= 52)
+    @test all(80 .<= colsizes[3,4,:,1][2:end] .<= 83)
 
-    @test all(188 .<= colsizes[2,1,:,1][end-1:end] .<= 188)
+    @test all(180 .<= colsizes[2,1,:,1][end-1:end] .<= 180)
     @test all(138 .<= colsizes[2,1,:,2][end-1:end] .<= 138)
-    @test all(324 .<= colsizes[2,2,:,1][end-1:end] .<= 324)
+    @test all(316 .<= colsizes[2,2,:,1][end-1:end] .<= 316)
     @test all(222 .<= colsizes[2,2,:,2][end-1:end] .<= 224)
     @test all(354 .<= colsizes[2,4,:,2][end-1:end] .<= 356)
-    @test all(558 .<= colsizes[2,4,:,1][2:end][end-1:end] .<= 561)
+    @test all(552 .<= colsizes[2,4,:,1][2:end][end-1:end] .<= 555)
 
     @test all(136 .<= colsizes[1,1,:,2][end-4:end] .<= 138)
     @test all(220 .<= colsizes[1,2,:,2][end-4:end] .<= 224)
