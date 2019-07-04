@@ -1,3 +1,6 @@
 docs/build/*
 Manifest.toml
 *.log
+docs/src/man/figs/*
+!docs/src/man/figs/2d*
+!docs/src/man/figs/3d*

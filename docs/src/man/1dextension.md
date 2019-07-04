@@ -1,18 +1,5 @@
 
 # 1D B-spline extension
-```@setup 1dframe
-using PGFPlotsX, BSplineExtension, DomainSets, LaTeXStrings
-P1 = ExtensionFramePlatform(BSplinePlatform(),0.0..0.5)
-P2 = ExtensionFramePlatform(EpsBSplinePlatform(),0.0..0.5)
-P3 = ExtensionFramePlatform(CDBSplinePlatform(),0.0..0.5)
-savefigs = (figname, obj) -> begin
-    pgfsave(figname * ".pdf", obj)
-    pgfsave(figname * ".tex", obj);
-    pgfsave(figname * ".tikz", obj;include_preamble=false);
-    run(`pdf2svg $(figname * ".pdf") $(figname * ".svg")`)
-    return nothing
-end
-```
 
 ```@meta
 DocTestSetup = quote
@@ -56,10 +43,10 @@ D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 julia> AZ_Zt(P1,N)
-Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
+Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
 
-M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
-M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
+M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
+M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
 E	:	Extending coefficients by zero padding
 D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
@@ -111,34 +98,11 @@ platform, B-spline order (`m`), `crop_tol` and degrees of freedom (`N`).
 ## Column truncation
 The column truncation of `A-AZ'A` depends on the order of the B-spline (and the domain) only.
 This is seen in the figure below, which shows `truncated_size(S)[2]` with `S=BSplineExtensionSolver(A-A*Zt*A)`.
-```@example 1dframe
-Ns = 20:20:300 # hide
-ds = 1:4 # hide
-PLATFORMs = (BSplinePlatform, EpsBSplinePlatform, CDBSplinePlatform) # hide
-crop_tols = 10.0.^(-16.:6.:-10.) # hide
-colsizes = Array{Int}(undef, length(PLATFORMs), length(ds), length(Ns), length(crop_tols)) # hide
-rowsizes = similar(colsizes) # hide
-for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns), (l,crop_tol) in enumerate(crop_tols) # hide
-    P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); # hide
-    plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N); # hide
-    M = plunge*A; # hide
-    colsizes[i,j,k,l], rowsizes[i,j,k,l]  = truncated_size(BSplineExtensionSolver(M; crop_tol=crop_tol)) # hide
-end # hide
-A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {legend_pos="north west",xlabel="N",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
-    for (j,d) in enumerate(ds) # hide
-        push!(A, @pgf PlotInc({color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"}, Table(Ns, rowsizes[i,j,:,1]))) # hide
-        i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
-    end # hide
-end # hide
-@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
-    A...) # hide
-savefigs("truncated_size_1", ans) # hide
-```
 
-[\[.pdf\]](truncated_size_1.pdf), [\[generated .tex\]](truncated_size_1.tex), [\[generated .tikz\]](truncated_size_1.tikz)
 
-![](truncated_size_1.svg)
+[\[.pdf\]](figs/truncated_size_1.pdf), [\[generated .tex\]](figs/truncated_size_1.tex), [\[generated .tikz\]](figs/truncated_size_1.tikz)
+
+![](figs/truncated_size_1.svg)
 
 ## Row truncation
 The row truncation of `A-AZ'A` depends on all of the parameters.
@@ -151,25 +115,11 @@ The `EpsBSplinePlatform` is a bit more robust  than the `BSplinePlatform` in gen
 since it enforces the dual dictionary to be
 compact, while the dual dictionaries of the latter are only ϵ-compact.
 
-```@example 1dframe
-A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
-    for (j,d) in enumerate(ds) # hide
-        opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
-        for (l,crop_tol) in enumerate(crop_tols) # hide
-            push!(A, @pgf Plot({opts..., (@pgf {solid}, {dashed})[l]...}, Table(Ns, colsizes[i,j,:,l]))) # hide
-            i==1 && push!(A, @pgf LegendEntry("m=$d($(crop_tol))")) # hide
-        end # hide
-    end # hide
-end # hide
-@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
-    A...) # hide
-savefigs("truncated_size_2", ans) # hide
-```
 
-[\[.pdf\]](truncated_size_2.pdf), [\[generated .tex\]](truncated_size_2.tex), [\[generated .tikz\]](truncated_size_2.tikz)
 
-![](truncated_size_2.svg)
+[\[.pdf\]](figs/truncated_size_2.pdf), [\[generated .tex\]](figs/truncated_size_2.tex), [\[generated .tikz\]](figs/truncated_size_2.tikz)
+
+![](figs/truncated_size_2.svg)
 
 # B-spline extension approximation
 The [`BSplineExtensionSolver`](@ref) is just a means to an end. It is used in the
@@ -183,40 +133,12 @@ In the figure below, which shows the uniform error of approximating a 1 dimensio
  we see that convergence is algebraic ($$\mathcal O(N^{-m})$$).
 This is common behaviour for approximating with splines.
 
-```@example 1dframe
-PLATFORMs = (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform) # hide
-Ns1 = [1<<k for k in 4:10] # hide
-Ns2 = [1<<k for k in 9:16] # hide
-ds = 1:4 # hide
-errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns1)) # hide
-timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2)) # hide
-for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
-    P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5) #hide
-    F,_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
-    errors[i,j,k] = abserror(exp, F) #hide
-end #hide
-for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2) #hide
-    P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); #hide
-    _,timings[i,j,k],_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver,  crop=true, crop_tol=1e-10) #hide
-end # hide
-A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
-    for (j,d) in enumerate(ds) # hide
-        opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
-        push!(A, @pgf Plot(opts, Table(Ns1, errors[i,j,:]))) # hide
-        i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
-    end # hide
-end # hide
-@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
-    A...) # hide
-savefigs("1derrors", ans) # hide
-```
+[\[.pdf\]](figs/1derrors.pdf), [\[generated .tex\]](figs/1derrors.tex), [\[generated .tikz\]](figs/1derrors.tikz)
 
-[\[.pdf\]](1derrors.pdf), [\[generated .tex\]](1derrors.tex), [\[generated .tikz\]](1derrors.tikz)
+![](figs/1derrors.svg)
 
-![](1derrors.svg)
 ## Timings
-For all platforms, the most costly part is the evaluating operator-vector multiply ``(A-AZ'A)x` since
+For all platforms, the most costly part is the evaluating operator-vector multiply $$(A-AZ'A)x$$ since
 solving the system is constant in `N` (it is $$\mathcal O(d^3)$$).
 For the first platform the operator-vector multiply time complexity is $$\mathcal O(N\log N)$$. For the
 last two the multiply time complexity is $$\mathcal O(N)$$. However, the construction complexity of `Z'` for the first two
@@ -226,25 +148,9 @@ The quasi-linear behaviour of the method is confirmed in the figure below that
 show the timings for approximating a 1 dimensional analytic function
     (details are in the introduction of this section).
 
-```@example 1dframe
-A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
-    for (j,d) in enumerate(ds) # hide
-        opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
-        push!(A, @pgf Plot(opts, Table(Ns2, timings[i,j,:]))) # hide
-        i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
-    end # hide
-    push!(A, @pgf Plot({color="black",dashed},Table(Ns2,5e-6Ns2))) # hide
-    i==1 && push!(A, LegendEntry(L"\mathcal O(N)")) # hide
-end # hide
-@pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
-    A...) # hide
-savefigs("1dtimings", ans) # hide
-```
+[\[.pdf\]](figs/1dtimings.pdf), [\[generated .tex\]](figs/1dtimings.tex), [\[generated .tikz\]](figs/1dtimings.tikz)
 
-[\[.pdf\]](1dtimings.pdf), [\[generated .tex\]](1dtimings.tex), [\[generated .tikz\]](1dtimings.tikz)
-
-![](1dtimings.svg)
+![](figs/1dtimings.svg)
 
 
 

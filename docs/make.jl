@@ -2,6 +2,10 @@ using Pkg
 Pkg.develop(PackageSpec(path=splitdir(@__DIR__)[1]))
 using Documenter, BSplineExtension
 
+
+include("render_figs.jl")
+
+
 const render_pdf = "pdf" in ARGS
 let r = r"buildroot=(.+)", i = findfirst(x -> occursin(r, x), ARGS)
     global const buildroot = i === nothing ? (@__DIR__) : first(match(r, ARGS[i]).captures)
