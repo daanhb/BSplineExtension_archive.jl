@@ -1,0 +1,313 @@
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={BSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=1(1.0e-16)}
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  95939  \\
+        }
+        ;
+    \addlegendentry {m=1(1.0e-5)}
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=2(1.0e-16)}
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=2(1.0e-5)}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=3(1.0e-16)}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=3(1.0e-5)}
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=4(1.0e-16)}
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addlegendentry {m=4(1.0e-5)}
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            1000  5000  \\
+            2744  9800  \\
+            9261  22050  \\
+            29791  48050  \\
+            91125  101250  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^{\frac{2}{3}})$}
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={EpsBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  95939  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  97336  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            1000  5000  \\
+            2744  9800  \\
+            9261  22050  \\
+            29791  48050  \\
+            91125  101250  \\
+        }
+        ;
+    \nextgroupplot[xlabel={N}, xmode={log}, ymode={log}, legend pos={north west}, title={CDBSplinePlatform}]
+    \addplot[color={blue}, mark={o}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3200  \\
+            9261  9317  \\
+            29791  74032  \\
+            91125  52011  \\
+        }
+        ;
+    \addplot[color={blue}, mark={o}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  988  \\
+            2744  2044  \\
+            9261  5735  \\
+            29791  39823  \\
+            91125  28415  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10447  \\
+            29791  101626  \\
+            91125  72722  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1330  \\
+            2744  3250  \\
+            9261  8451  \\
+            29791  67886  \\
+            91125  46683  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103480  \\
+            91125  90477  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3348  \\
+            9261  9919  \\
+            29791  81871  \\
+            91125  61399  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10648  \\
+            29791  103823  \\
+            91125  95139  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000  1331  \\
+            2744  3375  \\
+            9261  10523  \\
+            29791  94562  \\
+            91125  72947  \\
+        }
+        ;
+    \addplot[dashed, color={black}]
+        table[row sep={\\}]
+        {
+            \\
+            1000  5000  \\
+            2744  9800  \\
+            9261  22050  \\
+            29791  48050  \\
+            91125  101250  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
