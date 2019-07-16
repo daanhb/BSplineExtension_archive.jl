@@ -1,0 +1,123 @@
+\RequirePackage{luatex85}
+\documentclass[tikz]{standalone}
+% Default preamble
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{smithchart}
+\usepgfplotslibrary{statistics}
+\usepgfplotslibrary{dateplot}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={2 by 1}}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.015250601  \\
+            576.0  0.063329491  \\
+            2304.0  0.261313083  \\
+            9216.0  2.794213497  \\
+        }
+        ;
+    \addlegendentry {m=1}
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.024924689  \\
+            576.0  0.133652031  \\
+            2304.0  1.226910985  \\
+            9216.0  4.841394568  \\
+        }
+        ;
+    \addlegendentry {m=2}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.030346206  \\
+            576.0  0.151630031  \\
+            2304.0  1.639375014  \\
+            9216.0  22.475952263  \\
+        }
+        ;
+    \addlegendentry {m=3}
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.024696986  \\
+            576.0  0.175319251  \\
+            2304.0  1.946413714  \\
+            9216.0  28.805294513  \\
+        }
+        ;
+    \addlegendentry {m=4}
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.0864  \\
+            576.0  0.6912  \\
+            2304.0  5.5296  \\
+            9216.0  44.2368  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^\frac{3}{2})$}
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.009509847  \\
+            576.0  0.028646295  \\
+            2304.0  0.148323197  \\
+            9216.0  0.798522252  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.017110416  \\
+            576.0  0.046006661  \\
+            2304.0  0.246825988  \\
+            9216.0  1.735961416  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.019438868  \\
+            576.0  0.068169022  \\
+            2304.0  0.458812816  \\
+            9216.0  2.795510628  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.021408783  \\
+            576.0  0.093616278  \\
+            2304.0  0.511769553  \\
+            9216.0  5.189608256  \\
+        }
+        ;
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            144.0  0.0864  \\
+            576.0  0.6912  \\
+            2304.0  5.5296  \\
+            9216.0  44.2368  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
+\end{document}
