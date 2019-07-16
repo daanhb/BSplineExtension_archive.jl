@@ -1,8 +1,9 @@
 
 include("nonzero_cols.jl")
 include("nonzero_rows.jl")
-export BSplineExtensionSolver
+using SparseArrays
 
+export BSplineExtensionSolver
 """
     struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOperator{T}
 
@@ -28,6 +29,7 @@ See also:  [`nonzero_coefficients`](@ref)
     truncated Operator `M`. See `FrameFun`.
 - `crop::Bool = true`: Truncate the nonzero rows too.
 - `crop_tol::Number = 0`: If `crop` is true, truncate the rows with elements smaller than `crop_tol`.
+- `sparse::Bool = false`: convert the cropped matrix to a sparse matrix.
 - `verbose::Bool = false`: Print method information. See `FrameFun`
 
 # Examples
@@ -81,17 +83,17 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
     dest_linear ::  Vector{T}
 
     function BSplineExtensionSolver(M::DictionaryOperator{T};
-            crop=true, crop_tol=0, directsolver=:qr, verbose=false, lazy=false, options...) where T
+            crop=true, crop_tol=0, directsolver=:qr, verbose=false, lazy=false, sparse=false, options...) where T
 
         nonzero_cols = BSplineExtension.nonzero_cols(basis(src(M)), supergrid(FrameFun.BasisFunctions.grid(dest(M))), support(src(M)))
         dict_resop = IndexRestrictionOperator(src(M), src(M)[nonzero_cols], nonzero_cols)
 
-        verbose && println("Restrict columns (coefficients) from $(size(src(M))) to $(length(nonzero_cols))")
+        verbose && println("BSplineExtensionSolver: Restrict columns (coefficients) from $(size(src(M))) to $(length(nonzero_cols))")
 
         s = zeros(src(M))
         d = zeros(dest(M))
         m = Array{eltype(M)}(undef, size(M,1), length(nonzero_cols))
-        
+
         for (j,i) in enumerate(nonzero_cols )
             s[i] = 1
             FrameFun.BasisFunctions.apply!(M, d, s)
@@ -99,7 +101,7 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
             copyto!(m, size(M,1)*(j-1)+1, d, 1)
         end
         if crop
-            verbose && println("Restricting rows...")
+            verbose && println("BSplineExtensionSolver: Restricting rows...")
 
             nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
             I = LinearIndices(size(dest(M)))[nz_rows]
@@ -107,20 +109,30 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
                 m = view(m,I,:)
                 grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
 
-                verbose && println("Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
+                verbose && println("BSplineExtensionSolver: Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
             else
                 grid_resop = IdentityOperator(dest(M))
 
-                verbose && println("Rows are not restricted")
+                verbose && println("BSplineExtensionSolver: Rows are not restricted")
             end
         else
             grid_resop = IdentityOperator(dest(M))
+        end
+        if sparse
+            verbose && println("BSplineExtensionSolver: Sparsifying")
+            m[abs.(m) .< crop_tol] .= 0
+            m = SparseArrays.sparse(m)
+            verbose && println("BSplineExtensionSolver: fill $(nnz(m)/prod(size(m))*100)%")
+        else
+            m = Matrix(m)
         end
         new{T}(M, grid_resop, dict_resop', lazy ? FrameFun.BasisFunctions.GenericSolverOperator(ArrayOperator(m), ArrayOperator(m')) : FrameFun.FrameFunInterface.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
             zeros(length(nonzero_cols)), zeros(dest(grid_resop)),
             zeros(T, length(dest(M))), zeros(T, length(src(M))))
     end
 end
+
+LinearAlgebra.qr(M::SparseMatrixCSC, ::Val{true};opts...) = qr(M;opts...)
 
 export truncated_size
 """

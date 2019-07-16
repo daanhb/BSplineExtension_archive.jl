@@ -81,32 +81,32 @@ julia> P3 = NdCDBSplinePlatform((3,3))
 ProductPlatform{2}((CDBSplinePlatform{Float64,3}(), CDBSplinePlatform{Float64,3}()))
 
 julia> dictionary(P1,100)
-Dictionary P₂ ⊗ P₁
+Dictionary P₁ ⊗ P₂
 
-P₂	:	Periodic equispaced translates of B spline of degree 3
-		    ↳ length = 100
-		    ↳ Float64 -> Float64
-		    ↳ support = 0.0..1.0 (Unit)
-		    ↳ degree = 3
-P₁	:	Periodic equispaced translates of B spline of degree 2
+P₂	:	Periodic equispaced translates of B spline of degree 2
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 2
-
-julia> dictionary(P2,100)
-Dictionary P₁ ⊗ P₂
-
-P₂	:	Periodic equispaced translates of B spline of degree 3
+P₁	:	Periodic equispaced translates of B spline of degree 3
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 3
-P₁	:	Periodic equispaced translates of B spline of degree 1
+
+julia> dictionary(P2,100)
+Dictionary P₂ ⊗ P₁
+
+P₂	:	Periodic equispaced translates of B spline of degree 1
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 1
+P₁	:	Periodic equispaced translates of B spline of degree 3
+		    ↳ length = 100
+		    ↳ Float64 -> Float64
+		    ↳ support = 0.0..1.0 (Unit)
+		    ↳ degree = 3
 
 julia> dictionary(P3,100)
 Dictionary P ⊗ P
@@ -118,34 +118,34 @@ P	:	Periodic equispaced translates of B spline of degree 3
 		    ↳ degree = 3
 
 julia> azdual_dict(P1,100)
-Dictionary (M₁ * P₂) ⊗ (M₂ * P₁)
+Dictionary (M₁ * P₁) ⊗ (M₂ * P₂)
 
-P₂	:	Periodic equispaced translates of B spline of degree 3
-		    ↳ length = 100
-		    ↳ Float64 -> Float64
-		    ↳ support = 0.0..1.0 (Unit)
-		    ↳ degree = 3
-P₁	:	Periodic equispaced translates of B spline of degree 2
+P₂	:	Periodic equispaced translates of B spline of degree 2
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 2
-M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
-M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
-
-julia> azdual_dict(P2,100)
-Dictionary (M₁ * P₁) ⊗ (M₂ * P₂)
-
-P₂	:	Periodic equispaced translates of B spline of degree 3
+P₁	:	Periodic equispaced translates of B spline of degree 3
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 3
-P₁	:	Periodic equispaced translates of B spline of degree 1
+M₂	:	Multiplication by Circulant{Float64,Complex{Float64}}
+M₁	:	Multiplication by Circulant{Float64,Complex{Float64}}
+
+julia> azdual_dict(P2,100)
+Dictionary (M₂ * P₂) ⊗ (M₁ * P₁)
+
+P₂	:	Periodic equispaced translates of B spline of degree 1
 		    ↳ length = 100
 		    ↳ Float64 -> Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 1
+P₁	:	Periodic equispaced translates of B spline of degree 3
+		    ↳ length = 100
+		    ↳ Float64 -> Float64
+		    ↳ support = 0.0..1.0 (Unit)
+		    ↳ degree = 3
 M₂	:	Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 M₁	:	Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 

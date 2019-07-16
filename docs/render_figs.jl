@@ -20,7 +20,7 @@ P = @pgf GroupPlot({group_style = {group_size="2 by 1",},},
         {ymode="log"},
         PlotInc(f, F1;n=600),
         PlotInc(f, F2;n=600),
-        PlotInc(f, F3;n=600));
+        PlotInc(f, F3;n=600))
 DocumentPGFPlots.savefigs(joinpath(imgdir,"basis"), P) # hide
 
 Ns = 10*[1<<k for k in 0:11] # hide
@@ -50,7 +50,7 @@ colsizes = Array{Int}(undef, length(PLATFORMs), length(ds), length(Ns), length(c
 rowsizes = similar(colsizes) # hide
 for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns), (l,crop_tol) in enumerate(crop_tols) # hide
     P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); # hide
-    plunge = plungeoperator(P,N;L=4N); A = AZ_A(P,N;L=4N); Zt = AZ_Zt(P,N;L=4N); # hide
+    plunge = plungeoperator(P,N;); A = AZ_A(P,N;); Zt = AZ_Zt(P,N); # hide
     M = plunge*A; # hide
     colsizes[i,j,k,l], rowsizes[i,j,k,l]  = truncated_size(BSplineExtensionSolver(M; crop_tol=crop_tol)) # hide
 end # hide
@@ -87,12 +87,12 @@ errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns1)) # hid
 timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2)) # hide
 for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
     P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5) #hide
-    F,_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
+    F,_ = @timed Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
     errors[i,j,k] = abserror(exp, F) #hide
 end #hide
 for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2) #hide
     P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); #hide
-    _,timings[i,j,k],_ = @timed Fun(exp, P, N;L=4N, REG=BSplineExtension.BSplineExtensionSolver,  crop=true, crop_tol=1e-10) #hide
+    _,timings[i,j,k],_ = @timed Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver,  crop=true, crop_tol=1e-10) #hide
 end # hide
 A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
@@ -105,6 +105,7 @@ end # hide
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
     A...) # hide
 DocumentPGFPlots.savefigs(joinpath(imgdir,"1derrors"), P) # hide
+
 
 A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
@@ -121,7 +122,7 @@ P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hid
 DocumentPGFPlots.savefigs(joinpath(imgdir,"1dtimings"), P) # hide
 
 
-
+f = (x,y)->exp(x*y)
 # Ns = 6*[1<<k for k in 1:1:4]
 # ds = 1:4 # hide
 # PLATFORMs = (NdBSplinePlatform, NdEpsBSplinePlatform, NdCDBSplinePlatform) # hide
@@ -132,7 +133,7 @@ DocumentPGFPlots.savefigs(joinpath(imgdir,"1dtimings"), P) # hide
 # for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns), (l,crop_tol) in enumerate(crop_tols) # hide
 #     @show d, N
 #     P = ExtensionFramePlatform(PLATFORM((d,d)), (0.0..0.5)^2); # hide
-#     M = firstAZstepoperator(P,(N,N);L=(4N,4N)); # hide
+#     M = firstAZstepoperator(P,(N,N)); # hide
 #     colsizes[i,j,k,l], rowsizes[i,j,k,l]  = truncated_size(BSplineExtensionSolver(M; crop_tol=crop_tol,lazy=true)) # hide
 # end # hide
 # A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
@@ -175,12 +176,12 @@ DocumentPGFPlots.savefigs(joinpath(imgdir,"1dtimings"), P) # hide
 # timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2)) # hide
 # for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
 #     P = ExtensionFramePlatform(PLATFORM((d,d)), (0.0..0.5)^2) #hide
-#     F,_ = @timed Fun(f, P, (N,N);L=(4N,4N), REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
+#     F,_ = @timed Fun(f, P, (N,N);REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
 #     errors[i,j,k] = abserror(f, F) #hide
 # end #hide
 # for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2) #hide
 #     P = ExtensionFramePlatform(PLATFORM((d,d)), (0.0..0.5)^2) #hide
-#     _,timings[i,j,k],_ = @timed Fun(f, P, (N,N);L=(4N,4N), REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
+#     _,timings[i,j,k],_ = @timed Fun(f, P, (N,N);REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
 # end # hide
 # A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
 #     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
