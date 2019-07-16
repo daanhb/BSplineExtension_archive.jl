@@ -1,6 +1,7 @@
 using BSplineExtension, DomainSets, PGFPlotsX, DocumentPGFPlots, LaTeXStrings
 @info "Start rendering paper figures"
 imgdir = normpath(joinpath(@__DIR__(),"src","man","figs"))
+all=false
 
 Ns = 6*[1<<k for k in 1:1:4]
 ds = 1:4 # hide
@@ -35,7 +36,7 @@ A = [];
 
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
     A...) # hide
-DocumentPGFPlots.savefigs(joinpath(imgdir,"truncatedsizepaper"),P)
+DocumentPGFPlots.savefigs(joinpath(imgdir,"truncatedsizepaper"),P;all=all)
 
 
 
@@ -83,7 +84,7 @@ A = [];for i in 1:2 # hide
 end # hide
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="2 by 1",},}, # hide
     A...) # hide
-DocumentPGFPlots.savefigs(joinpath(imgdir,"2derrorpaper"),P) #
+DocumentPGFPlots.savefigs(joinpath(imgdir,"2derrorpaper"),P;all=all) #
 
 A = [];for i in 1:2  # hide
     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west"}) # hide
@@ -97,7 +98,7 @@ A = [];for i in 1:2  # hide
 end # hide
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="2 by 1",},}, # hide
     A...) # hide
-DocumentPGFPlots.savefigs(joinpath(imgdir,"2dtimingspaper"),P)
+DocumentPGFPlots.savefigs(joinpath(imgdir,"2dtimingspaper"),P;all=all)
 
 
 
@@ -133,7 +134,7 @@ A = [];for i in 1:2 # hide
 end # hide
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="2 by 1",},}, # hide
     A...) # hide
-DocumentPGFPlots.savefigs(joinpath(imgdir,"3derrorpaper"),P) #
+DocumentPGFPlots.savefigs(joinpath(imgdir,"3derrorpaper"),P;all=all) #
 
 A = [];for i in 1:2  # hide
     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west"}) # hide
@@ -147,4 +148,4 @@ A = [];for i in 1:2  # hide
 end # hide
 P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="2 by 1",},}, # hide
     A...) # hide
-DocumentPGFPlots.savefigs(joinpath(imgdir,"3dtimingspaper"),P)
+DocumentPGFPlots.savefigs(joinpath(imgdir,"3dtimingspaper"),P;all=all)
