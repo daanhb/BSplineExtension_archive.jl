@@ -1,5 +1,5 @@
 module BSplineExtension
-using Reexport, LinearAlgebra, StaticArrays, GridArrays
+using Reexport, LinearAlgebra, StaticArrays, GridArrays, MacroTools
 @reexport using CompactTranslatesDict, FrameFun, DomainSets
 
 using FrameFun.FrameFunInterface: directsolver
@@ -8,6 +8,7 @@ import FrameFun.Platforms: dictionary, SolverStyle, measure, SamplingStyle, dual
 import FrameFun.FrameFunInterface: correct_sampling_parameter
 
 include("plots.jl")
+include("sparsebandedmatrix.jl")
 
 include("platforms/AbstractBSplinePlatforms.jl")
 

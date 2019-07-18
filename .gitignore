@@ -4,3 +4,11 @@ Manifest.toml
 docs/src/man/figs/*
 !docs/src/man/figs/2d*
 !docs/src/man/figs/3d*
+docs/src/man/figs/2d*.aux
+docs/src/man/figs/2d*.fdb_latexmk
+docs/src/man/figs/2d*.fls
+docs/src/man/figs/2d*.log
+docs/src/man/figs/3d*.aux
+docs/src/man/figs/3d*.fdb_latexmk
+docs/src/man/figs/3d*.fls
+docs/src/man/figs/3d*.log

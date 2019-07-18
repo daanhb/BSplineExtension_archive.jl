@@ -90,40 +90,40 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
 
         verbose && println("BSplineExtensionSolver: Restrict columns (coefficients) from $(size(src(M))) to $(length(nonzero_cols))")
 
-        s = zeros(src(M))
-        d = zeros(dest(M))
-        m = Array{eltype(M)}(undef, size(M,1), length(nonzero_cols))
-
-        for (j,i) in enumerate(nonzero_cols )
-            s[i] = 1
-            FrameFun.BasisFunctions.apply!(M, d, s)
-            s[i] = 0
-            copyto!(m, size(M,1)*(j-1)+1, d, 1)
-        end
-        if crop
-            verbose && println("BSplineExtensionSolver: Restricting rows...")
-
-            nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
-            I = LinearIndices(size(dest(M)))[nz_rows]
-            if length(nz_rows) < size(M,1)
-                m = view(m,I,:)
-                grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
-
-                verbose && println("BSplineExtensionSolver: Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
-            else
-                grid_resop = IdentityOperator(dest(M))
-
-                verbose && println("BSplineExtensionSolver: Rows are not restricted")
-            end
-        else
-            grid_resop = IdentityOperator(dest(M))
-        end
         if sparse
             verbose && println("BSplineExtensionSolver: Sparsifying")
-            m[abs.(m) .< crop_tol] .= 0
-            m = SparseArrays.sparse(m)
+            m = SparseArrays.sparse(M*dict_resop').A
             verbose && println("BSplineExtensionSolver: fill $(nnz(m)/prod(size(m))*100)%")
+            grid_resop = IdentityOperator(dest(M))
         else
+            s = zeros(src(M))
+            d = zeros(dest(M))
+            m = Array{eltype(M)}(undef, size(M,1), length(nonzero_cols))
+
+            for (j,i) in enumerate(nonzero_cols )
+                s[i] = 1
+                FrameFun.BasisFunctions.apply!(M, d, s)
+                s[i] = 0
+                copyto!(m, size(M,1)*(j-1)+1, d, 1)
+            end
+            if crop
+                verbose && println("BSplineExtensionSolver: Restricting rows...")
+
+                nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
+                I = LinearIndices(size(dest(M)))[nz_rows]
+                if length(nz_rows) < size(M,1)
+                    m = view(m,I,:)
+                    grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
+
+                    verbose && println("BSplineExtensionSolver: Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
+                else
+                    grid_resop = IdentityOperator(dest(M))
+
+                    verbose && println("BSplineExtensionSolver: Rows are not restricted")
+                end
+            else
+                grid_resop = IdentityOperator(dest(M))
+            end
             m = Matrix(m)
         end
         new{T}(M, grid_resop, dict_resop', lazy ? FrameFun.BasisFunctions.GenericSolverOperator(ArrayOperator(m), ArrayOperator(m')) : FrameFun.FrameFunInterface.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),

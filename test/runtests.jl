@@ -24,6 +24,10 @@ end
     include("1dbsplineextension.jl")
 end
 
+@testset "Sparse platform" begin
+    include("test_sparsecdbsplineplatform.jl")
+end
+
 @testset "ND BSplineExtension" begin
     # include("Ndbsplineextension.jl")
 end

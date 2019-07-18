@@ -1,5 +1,5 @@
 \begin{tikzpicture}
-\begin{groupplot}[ymin={0}, group style={group size={2 by 1}}]
+\begin{groupplot}[ymin={1e-1}, ymax={1e6}, group style={group size={2 by 1}}]
     \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
     \addplot[color={blue}, mark={o}, mark options={solid}]
         table[row sep={\\}]
@@ -55,7 +55,7 @@
             91125.0  415188.28125  \\
         }
         ;
-    \addlegendentry {$\mathcal O(N^3)$}
+    \addlegendentry {$\mathcal O(N^2)$}
     \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
     \addplot[color={blue}, mark={o}, mark options={solid}]
         table[row sep={\\}]

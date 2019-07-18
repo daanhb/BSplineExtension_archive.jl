@@ -75,54 +75,54 @@ A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
         end # hide
     end # hide
 end # hide
-P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
+P = @pgf PGFPlotsX.GroupPlot({group_style={group_size="3 by 1",},}, # hide
     A...) # hide
 DocumentPGFPlots.savefigs(joinpath(imgdir,"truncated_size_2"), P) # hide
 
 PLATFORMs = (EpsBSplinePlatform, BSplinePlatform, CDBSplinePlatform) # hide
-Ns1 = [1<<k for k in 4:10] # hide
-Ns2 = [1<<k for k in 9:16] # hide
+Ns = round.(Int,exp.(LinRange(log.((100 ,5000))...,5)))
+Ns1 = round.(Int,exp.(LinRange(log.((1000 ,100000))...,5)))
 ds = 1:4 # hide
-errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns1)) # hide
-timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns2)) # hide
-for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
+errors = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns)) # hide
+timings = Array{Float64}(undef, length(PLATFORMs), length(ds), length(Ns)) # hide
+for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns) #hide
     P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5) #hide
     F,_ = @timed Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10) #hide
     errors[i,j,k] = abserror(exp, F) #hide
 end #hide
-for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns2) #hide
+for (i,PLATFORM) in enumerate(PLATFORMs), (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
     P = ExtensionFramePlatform(PLATFORM(d), 0.0..0.5); #hide
     _,timings[i,j,k],_ = @timed Fun(exp, P, N;REG=BSplineExtension.BSplineExtensionSolver,  crop=true, crop_tol=1e-10) #hide
 end # hide
 A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+    push!(A,@pgf {ymin=1e-15,ymax=1e-5,xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
     for (j,d) in enumerate(ds) # hide
         opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
-        push!(A, @pgf Plot(opts, Table(Ns1, errors[i,j,:]))) # hide
+        push!(A, @pgf Plot(opts, Table(Ns, errors[i,j,:]))) # hide
         i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
     end # hide
 end # hide
-P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
+P = @pgf PGFPlotsX.GroupPlot({group_style={group_size="3 by 1",},}, # hide
     A...) # hide
 DocumentPGFPlots.savefigs(joinpath(imgdir,"1derrors"), P) # hide
 
 
 A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-    push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+    push!(A,@pgf {ymin=1e-3,ymax=1,xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
     for (j,d) in enumerate(ds) # hide
         opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
-        push!(A, @pgf Plot(opts, Table(Ns2, timings[i,j,:]))) # hide
+        push!(A, @pgf Plot(opts, Table(Ns1, timings[i,j,:]))) # hide
         i==1 && push!(A, @pgf LegendEntry("m=$d")) # hide
     end # hide
-    push!(A, @pgf Plot({color="black",dashed},Table(Ns2,5e-6Ns2))) # hide
+    push!(A, @pgf Plot({color="black",dashed},Table(Ns1,5e-6Ns1))) # hide
     i==1 && push!(A, LegendEntry(L"\mathcal O(N)")) # hide
 end # hide
-P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
-    A...) # hide
+    P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
+        A...) # hide
 DocumentPGFPlots.savefigs(joinpath(imgdir,"1dtimings"), P) # hide
 
 
-f = (x,y)->exp(x*y)
+# f = (x,y)->exp(x*y)
 # Ns = 6*[1<<k for k in 1:1:4]
 # ds = 1:4 # hide
 # PLATFORMs = (NdBSplinePlatform, NdEpsBSplinePlatform, NdCDBSplinePlatform) # hide
@@ -152,7 +152,7 @@ f = (x,y)->exp(x*y)
 
 
 # A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-#     push!(A,@pgf {xlabel="N",xmode="log",ymode="log",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+#     push!(A,@pgf {ymin=1e2,ymax=5e4,xlabel="N",xmode="log",ymode="log",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
 #     for (j,d) in enumerate(ds) # hide
 #         opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
 #         for (l,crop_tol) in enumerate(crop_tols) # hide
@@ -193,12 +193,12 @@ f = (x,y)->exp(x*y)
 # end # hide
 # P = @pgf PGFPlotsX.GroupPlot({ymin=0,group_style={group_size="3 by 1",},}, # hide
 #     A...) # hide
-# DocumentPGFPlots.savefigs(joinpath(imddir,"2derrors"),P) #
+# DocumentPGFPlots.savefigs(joinpath(imgdir,"2derrors"),P) #
 
 
 
 # A = [];for (i,PLATFORM) in enumerate(PLATFORMs) # hide
-#     push!(A,@pgf {xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
+#     push!(A,@pgf {ymin=1e-2,ymax=1e2,xmode="log",ymode="log",xlabel="N",legend_pos="north west",title=["BSplinePlatform","EpsBSplinePlatform","CDBSplinePlatform"][i]}) # hide
 #     for (j,d) in enumerate(ds) # hide
 #         opts = @pgf {color=["blue", "red", "brown", "black"][j],mark=["o", "square", "diamond", "x"][j],mark_options="solid"} # hide
 #         push!(A, @pgf Plot(opts, Table(Ns2.^2, timings[i,j,:]))) # hide

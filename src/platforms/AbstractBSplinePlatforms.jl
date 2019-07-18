@@ -209,3 +209,5 @@ function dualdictionary(platform::CDBSplinePlatform, param, measure::UniformDira
         end
     end
 end
+
+include("SparseCDSplinePlatform.jl")
