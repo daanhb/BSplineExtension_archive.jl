@@ -32,7 +32,8 @@ end
 
 
 using Test, BSplineExtension, GridArrays
-using BSplineExtension: coefficient_indices_of_overlapping_elements
+using BSplineExtension.BSplineExtensionSolvers: coefficient_indices_of_overlapping_elements,
+    coefficient_index_mask_of_overlapping_elements
 @testset "Extensionframe platform, nonzero indices" begin
     dict = BSplineTranslatesBasis(5,2)
     @test coefficient_indices_of_overlapping_elements(dict, PeriodicEquispacedGrid(100, 0,.1)) == [1,2,5]
@@ -59,13 +60,13 @@ using BSplineExtension: coefficient_indices_of_overlapping_elements
 
     g = MidpointEquispacedGrid(100,UnitInterval())
     b = g[findall(GridArrays.boundary_mask(g, 0.0..0.5, true))]
-    m1 = BSplineExtension.coefficient_index_mask_of_overlapping_elements(dict, b)
+    m1 = coefficient_index_mask_of_overlapping_elements(dict, b)
     m2 = sum(evaluation_matrix(dict, b);dims=1 ) .!= 0
     @test m1[:]==m2[:]
 end
 
 using BSplineExtension, Test
-using BSplineExtension: nonzero_rows, nonzero_cols
+using BSplineExtension.BSplineExtensionSolvers: nonzero_rows, nonzero_cols
 @testset "ExtensionFramePlatform, nonzero_rows, nonzero_cols" begin
     # 1D nonzero_cols
     for d in (1,2,3,4)

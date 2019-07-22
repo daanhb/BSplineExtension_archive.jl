@@ -1,9 +1,22 @@
-abstract type AbstractBSplinePlatform{T,D} <: BasisPlatform end
-dictionary(p::AbstractBSplinePlatform{T,D}, n::Int) where {T,D} = BSplineTranslatesBasis{T,D}(n)
-SolverStyle(p::AbstractBSplinePlatform, ::SamplingStyle) = DualStyle()
-correct_sampling_parameter(::AbstractBSplinePlatform, param, L; options...) = error()
-correct_sampling_parameter(::AbstractBSplinePlatform, param::Int, L::Int; options...) =
+module BSplinePlatforms
+
+using FrameFun.Platforms, FrameFun.BasisFunctions, CompactTranslatesDict
+
+
+import FrameFun.Platforms: dictionary, SolverStyle, measure, SamplingStyle, dualdictionary
+import FrameFun.FrameFunInterface: correct_sampling_parameter, regularization_threshold
+import FrameFun: dictionary
+
+
+abstract type AbstractPeriodicEquispacedTranslatesPlatform <: BasisPlatform end
+
+SolverStyle(p::AbstractPeriodicEquispacedTranslatesPlatform, ::SamplingStyle) = DualStyle()
+correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param, L; options...) = error()
+correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param::Int, L::Int; options...) =
     (round(Int, L/param) * param)
+
+abstract type AbstractBSplinePlatform{T,D} <: AbstractPeriodicEquispacedTranslatesPlatform end
+dictionary(p::AbstractBSplinePlatform{T,D}, n::Int) where {T,D} = BSplineTranslatesBasis{T,D}(n)
 
 
 export BSplinePlatform
@@ -110,8 +123,8 @@ end
 
 EpsBSplinePlatform(degree::Int=3) = EpsBSplinePlatform{Float64,degree}()
 
-function dualdictionary(platform::EpsBSplinePlatform, param, measure::Measure;
-        threshold=nothing, options...)
+function dualdictionary(platform::EpsBSplinePlatform{T}, param, measure::Measure;
+        threshold=regularization_threshold(T), options...) where T
     dual = gramdual(dictionary(platform, param), measure;options...)
     op = BasisFunctions.operator(dual)
     @assert op isa CirculantOperator
@@ -120,7 +133,6 @@ function dualdictionary(platform::EpsBSplinePlatform, param, measure::Measure;
     e = zeros(src(op)); e[1] = 1
     column = op*e
     # bandwidth determined by threshold
-    (threshold==nothing) && (threshold=FrameFun.default_threshold(op))
     # we want \|I-G (G̃+E)\|< threshold, therefore \|E\| < threshold / \|G\|
     mask = abs.(column) .< threshold / norm(inv(op).A.vcvr_dft,Inf)
     bw = (findfirst(mask), findlast(mask))
@@ -210,4 +222,54 @@ function dualdictionary(platform::CDBSplinePlatform, param, measure::UniformDira
     end
 end
 
-include("SparseCDSplinePlatform.jl")
+using CompactTranslatesDict: PeriodicEquispacedTranslates
+abstract type AbstractPETPlatorm{T,S,DICT} <: AbstractPeriodicEquispacedTranslatesPlatform end
+dictionary(platform::AbstractPETPlatorm, param) = similar(platform.dict, param)
+SamplingStyle(::AbstractPETPlatorm) = OversamplingStyle()
+
+export PETPlatform
+"""
+    struct PETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+"""
+struct PETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+    dict    :: DICT
+end
+
+PETPlatform(degree::Int=3) = BSplinePlatform{Float64,degree}()
+
+export CDPETPlatform
+"""
+    struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+"""
+struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+    dict    :: DICT
+end
+
+include("CompactPeriodicEquispacedTranslatesDuals.jl")
+using .CompactPeriodicEquispacedTranslatesDuals
+
+dualdictionary(platform::CDPETPlatform, param, measure::Measure; options...) =
+    error("No azdual_dict for `CDPETPlatform` and $(typeof(measure))")
+
+function dualdictionary(platform::CDPETPlatform, param, measure::UniformDiracCombMeasure;
+        options...)
+    dict = dictionary(platform, param)
+    g = grid(measure)
+    @assert support(dict) ≈ support(g)
+    m = length(g) / length(dict)
+    @assert round(Int,m) ≈ m
+    m = round(Int, m)
+    if m == 1
+        @warn "No compact dual possible, try oversampling"
+        return dual(dict, measure; options...)
+    else
+        if isperiodic(g)
+            return CompactPeriodicEquispacedTranslatesDual(dict, m)
+        else
+            error()
+        end
+    end
+end
+
+
+end

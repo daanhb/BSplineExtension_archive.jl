@@ -1,12 +1,12 @@
-
+export nonzero_cols
 nonzero_cols(dict::Dictionary, gamma::AbstractGrid, domain::Domain) =
-    coefficient_indices_of_overlapping_elements(dict, gamma[findall(GridArrays.boundary_mask(gamma, domain, true))])
+    coefficient_indices_of_overlapping_elements(dict, gamma[findall(boundary_mask(gamma, domain, true))])
 
 nonzero_cols(dict::TensorProductDict{N}, gamma::AbstractGrid, domain::Domain) where N =
-    coefficient_indices_of_overlapping_elements(dict, gamma[findall(GridArrays.boundary_mask(gamma, domain, ntuple(k->true,Val(N))))])
+    coefficient_indices_of_overlapping_elements(dict, gamma[findall(boundary_mask(gamma, domain, ntuple(k->true,Val(N))))])
 
-# TODO
-# nonzero_cols(dict::TensorProductDict, gamma::GridArrays.ProductGrid, domain::Domains.ProductDomain) =
+# # TODO
+# # nonzero_cols(dict::TensorProductDict, gamma::GridArrays.ProductGrid, domain::Domains.ProductDomain) =
 
 
 export nonzero_coefficients
@@ -41,7 +41,7 @@ end
 
 # Range of coefficient indices of B that overlap with the point x.
 coefficient_index_range_of_overlapping_elements(B::Dictionary, x) =
-    GridArrays.ModCartesianIndices(size(B), coefficient_cartesian_index_limits_of_overlapping_elementst(B, x)...)
+    ModCartesianIndices(size(B), coefficient_cartesian_index_limits_of_overlapping_elementst(B, x)...)
 
 coefficient_index_mask_of_overlapping_elements(d::Dictionary, g::AbstractArray) =
     coefficient_index_mask_of_overlapping_elements!(BitArray(undef, size(d)), d, g)

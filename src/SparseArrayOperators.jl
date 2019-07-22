@@ -1,4 +1,4 @@
-module SparseBandedMatrices
+module SparseArrayOperators
 
 using FrameFun.BasisFunctions
 using FrameFun.BasisFunctions: VerticalBandedMatrix, HorizontalBandedMatrix, ArrayOperator,

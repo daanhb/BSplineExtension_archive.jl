@@ -24,8 +24,8 @@ end
     include("1dbsplineextension.jl")
 end
 
-@testset "Sparse platform" begin
-    include("test_sparsecdbsplineplatform.jl")
+@testset "CDPET platform" begin
+    include("test_compactperiodicequispacedtranslatesdual.jl")
 end
 
 @testset "ND BSplineExtension" begin

@@ -1,11 +1,18 @@
+module BSplineExtensionSolvers
+
+using SparseArrays, StaticArrays, FrameFun.BasisFunctions, FrameFun.BasisFunctions.GridArrays,
+    LinearAlgebra, FrameFun.ExtensionFrames, DomainSets
+import FrameFun.BasisFunctions: linearized_apply!, apply!, GenericSolverOperator,
+    VectorizingSolverOperator
+using FrameFun.FrameFunInterface
+using FrameFun.BasisFunctions.GridArrays: boundary_mask, ModCartesianIndices
 
 include("nonzero_cols.jl")
 include("nonzero_rows.jl")
-using SparseArrays
 
 export BSplineExtensionSolver
 """
-    struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOperator{T}
+    struct BSplineExtensionSolver{T} <: BasisFunctions.VectorizingSolverOperator{T}
 
 This solver is efficient and effective in the first step of the AZ algorithm of a compact dictionary only.
 For this dictionary the function `nonzero_coefficients` should be much smaller than the length of the dictionary.
@@ -70,11 +77,11 @@ Basis: Extension frame
 
 ```
 """
-struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOperator{T}
+struct BSplineExtensionSolver{T} <: VectorizingSolverOperator{T}
     op      :: DictionaryOperator{T}
     grid_res     :: DictionaryOperator{T}
     dict_ext     :: DictionaryOperator{T}
-    sol     :: FrameFun.BasisFunctions.VectorizingSolverOperator{T}
+    sol     :: VectorizingSolverOperator{T}
 
     dict_scratch
     grid_scratch
@@ -85,49 +92,52 @@ struct BSplineExtensionSolver{T} <: FrameFun.BasisFunctions.VectorizingSolverOpe
     function BSplineExtensionSolver(M::DictionaryOperator{T};
             crop=true, crop_tol=0, directsolver=:qr, verbose=false, lazy=false, sparse=false, options...) where T
 
-        nonzero_cols = BSplineExtension.nonzero_cols(basis(src(M)), supergrid(FrameFun.BasisFunctions.grid(dest(M))), support(src(M)))
-        dict_resop = IndexRestrictionOperator(src(M), src(M)[nonzero_cols], nonzero_cols)
+        _nonzero_cols = nonzero_cols(basis(src(M)), supergrid(grid(dest(M))), support(src(M)))
+        dict_resop = IndexRestrictionOperator(src(M), src(M)[_nonzero_cols], _nonzero_cols)
 
-        verbose && println("BSplineExtensionSolver: Restrict columns (coefficients) from $(size(src(M))) to $(length(nonzero_cols))")
+        verbose && println("BSplineExtensionSolver: Restrict columns (coefficients) from $(size(src(M))) to $(length(_nonzero_cols))")
 
         if sparse
             verbose && println("BSplineExtensionSolver: Sparsifying")
             m = SparseArrays.sparse(M*dict_resop').A
             verbose && println("BSplineExtensionSolver: fill $(nnz(m)/prod(size(m))*100)%")
-            grid_resop = IdentityOperator(dest(M))
         else
             s = zeros(src(M))
             d = zeros(dest(M))
-            m = Array{eltype(M)}(undef, size(M,1), length(nonzero_cols))
+            m = Array{eltype(M)}(undef, size(M,1), length(_nonzero_cols))
 
-            for (j,i) in enumerate(nonzero_cols )
+            for (j,i) in enumerate(_nonzero_cols )
                 s[i] = 1
-                FrameFun.BasisFunctions.apply!(M, d, s)
+                apply!(M, d, s)
                 s[i] = 0
                 copyto!(m, size(M,1)*(j-1)+1, d, 1)
             end
-            if crop
-                verbose && println("BSplineExtensionSolver: Restricting rows...")
+        end
+        if crop
+            verbose && println("BSplineExtensionSolver: Restricting rows...")
+            nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
+            I = LinearIndices(size(dest(M)))[nz_rows]
 
-                nz_rows = findall(nonzero_rows(m,size(dest(M));nonzero_tol=crop_tol))[:]
-                I = LinearIndices(size(dest(M)))[nz_rows]
-                if length(nz_rows) < size(M,1)
-                    m = view(m,I,:)
-                    grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(FrameFun.BasisFunctions.grid(dest(M))[I]),nz_rows)
+            if length(nz_rows) < size(M,1)
+                m = m[I,:]
+                grid_resop = IndexRestrictionOperator(dest(M), GridBasis{coefficienttype(dest(M))}(grid(dest(M))[I]),nz_rows)
 
-                    verbose && println("BSplineExtensionSolver: Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
-                else
-                    grid_resop = IdentityOperator(dest(M))
-
-                    verbose && println("BSplineExtensionSolver: Rows are not restricted")
+                verbose && println("BSplineExtensionSolver: Restrict rows (collocation points) from $(size(dest(M))) to $(length(nz_rows))")
+                if sparse
+                    verbose && println("BSplineExtensionSolver: fill $(nnz(m)/prod(size(m))*100)%")
                 end
             else
                 grid_resop = IdentityOperator(dest(M))
+                verbose && println("BSplineExtensionSolver: Rows are not restricted")
             end
-            m = Matrix(m)
+        else
+            grid_resop = IdentityOperator(dest(M))
         end
-        new{T}(M, grid_resop, dict_resop', lazy ? FrameFun.BasisFunctions.GenericSolverOperator(ArrayOperator(m), ArrayOperator(m')) : FrameFun.FrameFunInterface.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
-            zeros(length(nonzero_cols)), zeros(dest(grid_resop)),
+
+        new{T}(M, grid_resop, dict_resop',
+            lazy ? GenericSolverOperator(ArrayOperator(m), ArrayOperator(m')) :
+                FrameFunInterface.directsolver(ArrayOperator(m); directsolver=directsolver, verbose=verbose, options...),
+            zeros(length(_nonzero_cols)), zeros(dest(grid_resop)),
             zeros(T, length(dest(M))), zeros(T, length(src(M))))
     end
 end
@@ -142,8 +152,10 @@ The size of the smaller system. The one that has to be solved with a direct solv
 """
 truncated_size(op::BSplineExtensionSolver) = size(inv(op.sol))
 
-function FrameFun.BasisFunctions.linearized_apply!(op::BSplineExtensionSolver, dest::Vector, src::Vector)
-    FrameFun.BasisFunctions.apply!(op.grid_res, op.grid_scratch, src)
-    FrameFun.BasisFunctions.apply!(op.sol, op.dict_scratch, op.grid_scratch)
-    FrameFun.BasisFunctions.apply!(op.dict_ext, dest, op.dict_scratch)
+function linearized_apply!(op::BSplineExtensionSolver, dest::Vector, src::Vector)
+    apply!(op.grid_res, op.grid_scratch, src)
+    apply!(op.sol, op.dict_scratch, op.grid_scratch)
+    apply!(op.dict_ext, dest, op.dict_scratch)
+end
+
 end
