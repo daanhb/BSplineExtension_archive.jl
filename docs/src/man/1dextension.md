@@ -3,7 +3,7 @@
 
 ```@meta
 DocTestSetup = quote
-    using BSplineExtension, DomainSets  
+    using BSplineExtension, DomainSets
 end
 ```
 
@@ -52,7 +52,7 @@ D	:	Diagonal operator with element type Float64
 		    ↳ [1.0, 1.0, 1.0  …  1.0, 1.0, 1.0]
 
 julia> AZ_Zt(P2,N)
-Operator M₂ * M₁ * E[ 𝕀 → 1:401] * D
+Operator M₁ * M₂ * E[ 𝕀 → 1:401] * D
 
 M₂	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
 M₁	:	Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
@@ -157,11 +157,11 @@ show the timings for approximating a 1 dimensional analytic function
 # B-spline extension Reference
 
 ```@autodocs
-Modules = [BSplineExtension]
+Modules = [BSplineExtensionSolvers]
 Pages = ["nonzero_cols.jl"]
 ```
 
 ```@autodocs
-Modules = [BSplineExtension]
-Pages = ["BSplineExtensionSolver.jl"]
+Modules = [BSplineExtensionSolvers]
+Pages = ["BSplineExtensionSolvers.jl"]
 ```

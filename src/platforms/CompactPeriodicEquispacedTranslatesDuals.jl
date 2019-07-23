@@ -12,7 +12,6 @@ using CompactTranslatesDict: PeriodicEquispacedTranslates, kernel_support
 import CompactTranslatesDict: eval_kernel
 
 using InfiniteVectors: Integers, downsample, subvector, CompactInfiniteVector, PeriodicInfiniteVector
-string(::Integers) = "The integers (ℤ)"
 
 export CompactPeriodicEquispacedTranslatesDual
 """
@@ -28,11 +27,18 @@ Used in [`CDPETPlatform`](@ref)
 
 # Example
 ```jldocs
-julia> B = CompactPeriodicEquispacedTranslatesDual(3,2,10)
+julia> using BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals, CompactTranslatesDict
 
-julia> A = evaluation_operator(B, PeriodicEquispacedGrid(10, support(B)))
+julia> B = CompactPeriodicEquispacedTranslatesDual(BSplineTranslatesBasis(10,3,-1,1), 2)
+Equispaced translates of a discrete kernel dual
+    ↳ Periodic equispaced translates of a periodic kernel function
+      ↳ length = 10
+      ↳ Float64 -> Float64
+      ↳ support = -1.0..1.0
+    ↳ m = 2
 
-
+julia> A = evaluation_operator(B, PeriodicEquispacedGrid(10, BasisFunctions.support(B)))
+Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 ```
 """
 struct CompactPeriodicEquispacedTranslatesDual{T,K,DICT<:PeriodicEquispacedTranslates{T,K}} <: PeriodicEquispacedTranslates{T,K}
@@ -44,13 +50,10 @@ size(dict::CompactPeriodicEquispacedTranslatesDual) = (length(dict.dict),)
 length(dict::CompactPeriodicEquispacedTranslatesDual) = length(dict.dict)
 support(dict::CompactPeriodicEquispacedTranslatesDual) = support(dict.dict)
 
-name(dict::CompactPeriodicEquispacedTranslatesDual)= "Equispaced translates of a discrete kernel dual to $(name(dict.dict))"
+name(dict::CompactPeriodicEquispacedTranslatesDual)= "Equispaced translates of a discrete kernel dual"
 
-strings(d::CompactPeriodicEquispacedTranslatesDual) = (string(d),
-    ("length = $(length(d))",
-     "$(domaintype(d)) -> $(codomaintype(d))",
-     "support = $(support(d))",
-     "m = $(d.m)"),
+strings(d::CompactPeriodicEquispacedTranslatesDual) = (string(d),strings(d.dict),(
+     "m = $(d.m)",),
      )
 
 unsafe_eval_element(dict::CompactPeriodicEquispacedTranslatesDual, i, x) =
@@ -79,9 +82,15 @@ function grid_evaluation_operator(dict::CompactPeriodicEquispacedTranslatesDual{
     # Convert PeriodicInfiniteVector to VerticalBandedMatrix
     mask = 0 .==subvector(v)
     a, b = findfirst(mask), findlast(mask)
+
     if a!=nothing && b!= nothing
-        bw = findfirst(mask)-1, findlast(mask)+1
-        a = [subvector(v)[bw[2]:end];subvector(v)[1:bw[1]]]
+        if a == 1 || b==length(mask)
+            bw = findlast(.!(mask)), findfirst(.!(mask))
+            a = subvector(v)[bw[2]:bw[1]]
+        else
+            bw = a-1, b+1
+            a = [subvector(v)[bw[2]:end];subvector(v)[1:bw[1]]]
+        end
     else
         bw = 0, 1
         a = subvector(v)

@@ -230,6 +230,46 @@ SamplingStyle(::AbstractPETPlatorm) = OversamplingStyle()
 export PETPlatform
 """
     struct PETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+
+A platform of periodic equispaced translates of a kernel.
+
+See also: [`CDPETPlatform`](@ref), [`BSplinePlatform`](@ref)
+# Example
+```jldocs
+julia> P = PETPlatform(BSplineTranslatesBasis(6,3,-1,1))
+PETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -> Float64
+    ↳ support = -1.0..1.0
+
+)
+
+julia> d1 = dictionary(P,6)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -> Float64
+    ↳ support = -1.0..1.0
+
+
+
+julia> d2 = azdual_dict(P,6)
+Dictionary M * P
+
+P   :   Periodic equispaced translates of a periodic kernel function
+            ↳ length = 6
+            ↳ Float64 -> Float64
+            ↳ support = -1.0..1.0
+M   :   Multiplication by Circulant{Float64,Complex{Float64}}
+
+
+julia> g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,6)))
+Multiplication by Circulant{Float64,Complex{Float64}}
+
+
+
+julia> g2≈IdentityOperator(d1)
+true
+```
 """
 struct PETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
     dict    :: DICT
@@ -240,6 +280,51 @@ PETPlatform(degree::Int=3) = BSplinePlatform{Float64,degree}()
 export CDPETPlatform
 """
     struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+
+A platform of periodic equispaced translates of a kernel.
+Their duals dictionaries are compact, but discrete, i.e.,
+their values are known in an `PeriodicEquispacedGrid`. For some kernels these compact duals do not exist.
+
+See also: [`PETPlatform`](@ref), [`CDBSplinePlatform`](@ref)
+# Example
+```jldocs
+julia> P = CDPETPlatform(BSplineTranslatesBasis(6,3,-1,1))
+CDPETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -> Float64
+    ↳ support = -1.0..1.0
+
+)
+
+julia> d1 = dictionary(P,6)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -> Float64
+    ↳ support = -1.0..1.0
+
+
+
+julia> d2 = azdual_dict(P,6)
+Equispaced translates of a discrete kernel dual
+    ↳ Periodic equispaced translates of a periodic kernel function
+      ↳ length = 6
+      ↳ Float64 -> Float64
+      ↳ support = -1.0..1.0
+    ↳ m = 2
+
+
+
+julia> g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,6)))
+Operator M₁ * M₂
+
+M₂  :   Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
+M₁  :   Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+
+
+julia> g2≈IdentityOperator(d1)
+true
+
+```
 """
 struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
     dict    :: DICT

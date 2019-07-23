@@ -153,5 +153,5 @@ DocumentPGFPlots.savefigs(joinpath(imgdir,"3dtimingspaper"),P;all=all)
 DocumentPGFPlots.savefigs(joinpath(imgdir,"truncatedsizepaper"),P;render=false)
 DocumentPGFPlots.savefigs(joinpath(imgdir,"2derrorpaper"),P;render=false)
 DocumentPGFPlots.savefigs(joinpath(imgdir,"2dtimingspaper"),P;render=false)
-DocumentPGFPlots.savefigs(joinpath(imgdir,"3derrorpaper"),P;render=false) #
+DocumentPGFPlots.savefigs(joinpath(imgdir,"3derrorpaper"),P;render=false)
 DocumentPGFPlots.savefigs(joinpath(imgdir,"3dtimingspaper"),P;render=false)

@@ -1,9 +1,9 @@
 using Pkg
 Pkg.develop(PackageSpec(path=splitdir(@__DIR__)[1]))
-using Documenter, BSplineExtension
+using Documenter, BSplineExtension, BSplineExtension.BSplinePlatforms, BSplineExtension.BSplineExtensionSolvers
 
 
-include("render_figs.jl")
+# include("render_figs.jl")
 
 
 const render_pdf = "pdf" in ARGS
@@ -22,7 +22,7 @@ else
 end
 ENV["JULIA_DEBUG"] = ""
 makedocs(sitename="BSplineExtension.jl",
-    modules = [BSplineExtension],
+    modules = [BSplineExtension,BSplinePlatforms,BSplineExtensionSolvers],
     authors = "vincentcp",
     format = format,
     pages = [
@@ -31,11 +31,11 @@ makedocs(sitename="BSplineExtension.jl",
                     "1D extension platform" => "man/1dextension.md",
                     "ND extension platform" => "man/ndbsplineextension.md"]
         ],
-    doctest=:fix
+    doctest=true
 )
 
 if "deploy" in ARGS && Sys.ARCH === :x86_64 && Sys.KERNEL === :Linux
     deploydocs(
-        repo = "github.com/vincentcp/BSplineExtension.jl.git",
+        repo = "github.com/FrameFunVC/BSplineExtension.jl.git",
     )
 end
