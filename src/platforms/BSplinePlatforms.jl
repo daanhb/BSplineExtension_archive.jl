@@ -224,6 +224,7 @@ end
 
 using CompactTranslatesDict: PeriodicEquispacedTranslates
 abstract type AbstractPETPlatorm{T,S,DICT} <: AbstractPeriodicEquispacedTranslatesPlatform end
+abstract type AbstractCDPETPlatorm{T,S,DICT} <: AbstractPETPlatorm{T,S,DICT} end
 dictionary(platform::AbstractPETPlatorm, param) = similar(platform.dict, param)
 SamplingStyle(::AbstractPETPlatorm) = OversamplingStyle()
 
@@ -279,7 +280,7 @@ PETPlatform(degree::Int=3) = BSplinePlatform{Float64,degree}()
 
 export CDPETPlatform
 """
-    struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+    struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractCDPETPlatorm{T,S,DICT}
 
 A platform of periodic equispaced translates of a kernel.
 Their duals dictionaries are compact, but discrete, i.e.,
@@ -326,17 +327,17 @@ true
 
 ```
 """
-struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
+struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractCDPETPlatorm{T,S,DICT}
     dict    :: DICT
 end
 
 include("CompactPeriodicEquispacedTranslatesDuals.jl")
 using .CompactPeriodicEquispacedTranslatesDuals
 
-dualdictionary(platform::CDPETPlatform, param, measure::Measure; options...) =
-    error("No azdual_dict for `CDPETPlatform` and $(typeof(measure))")
+dualdictionary(platform::AbstractCDPETPlatorm, param, measure::Measure; options...) =
+    error("No azdual_dict for $(typeof(platform)) and $(typeof(measure))")
 
-function dualdictionary(platform::CDPETPlatform, param, measure::UniformDiracCombMeasure;
+function dualdictionary(platform::AbstractCDPETPlatorm, param, measure::UniformDiracCombMeasure;
         options...)
     dict = dictionary(platform, param)
     g = grid(measure)

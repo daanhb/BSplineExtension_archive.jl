@@ -1,5 +1,5 @@
 
-function nonzero_rows(m::Matrix, s=size(m,1);nonzero_tol=0)
+function nonzero_rows(m::AbstractMatrix, s=size(m,1);nonzero_tol=0)
     mask = falses(s)
     if nonzero_tol == 0
         nonzero_rows!(mask, m)
@@ -29,4 +29,16 @@ function nonzero_rows!(mask::BitArray, m::Matrix, tol)
             end
         end
     end
+end
+
+function nonzero_rows!(mask::BitArray, m::SparseMatrixCSC)
+    mask[m.rowval] .= true
+end
+
+function nonzero_rows!(mask::BitArray, m::SparseMatrixCSC, tol)
+    for (x,y,v) in zip(findnz(m)...)
+        if abs(v) > tol
+            mask[x] = true
+        end
+   end
 end

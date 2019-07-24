@@ -158,4 +158,9 @@ function linearized_apply!(op::BSplineExtensionSolver, dest::Vector, src::Vector
     apply!(op.dict_ext, dest, op.dict_scratch)
 end
 
+export sparseQR_solver
+sparseQR_solver(op::DictionaryOperator; options...) =
+    GenericSolverOperator(op, sparseqr_factorization(op))
+
+sparseqr_factorization(op::DictionaryOperator) = qr(sparse(op).A)
 end
