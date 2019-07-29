@@ -1,0 +1,131 @@
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  0.00021834544529595768  \\
+            256.0  7.822843970867466e-5  \\
+            729.0  2.6568104314112494e-5  \\
+            2025.0  9.21416349513815e-6  \\
+        }
+        ;
+    \addlegendentry {m=1}
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.5689573376331811e-6  \\
+            256.0  3.4078489674405077e-7  \\
+            729.0  6.32174976411548e-8  \\
+            2025.0  1.648003027931999e-8  \\
+        }
+        ;
+    \addlegendentry {m=2}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  9.114039131286056e-8  \\
+            256.0  1.590641593329778e-8  \\
+            729.0  1.952307815411558e-9  \\
+            2025.0  4.3869875177016125e-10  \\
+        }
+        ;
+    \addlegendentry {m=3}
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.7377021754860778e-9  \\
+            256.0  1.5609882608735859e-10  \\
+            729.0  9.757971097812402e-12  \\
+            2025.0  8.122191808013212e-13  \\
+        }
+        ;
+    \addlegendentry {m=4}
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  0.00022043488706158408  \\
+            256.0  7.87692189169703e-5  \\
+            729.0  2.413163531493068e-5  \\
+            2025.0  9.058466196137926e-6  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.433582845897785e-6  \\
+            256.0  3.448881235423862e-7  \\
+            729.0  5.914565193609889e-8  \\
+            2025.0  1.7068937924191728e-8  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  8.503957633965165e-8  \\
+            256.0  1.4448756689988684e-8  \\
+            729.0  1.8256409062278323e-9  \\
+            2025.0  3.8889307552025797e-10  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.4045411822483088e-9  \\
+            256.0  1.6046243334066902e-10  \\
+            729.0  1.0088387902840167e-11  \\
+            2025.0  7.105072086233122e-13  \\
+        }
+        ;
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  0.0002422688309754656  \\
+            256.0  9.143291452620161e-5  \\
+            729.0  2.296607131648254e-5  \\
+            2025.0  9.906187478053718e-6  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.6552486060827932e-6  \\
+            256.0  3.245702011822615e-7  \\
+            729.0  5.712220192521933e-8  \\
+            2025.0  1.4238339437477877e-8  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  6.780605268819073e-8  \\
+            256.0  1.4245607996565824e-8  \\
+            729.0  1.836606355887227e-9  \\
+            2025.0  2.6822346455013246e-10  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            100.0  1.9508563131598323e-9  \\
+            256.0  1.3599084303095311e-10  \\
+            729.0  1.1710759029170958e-11  \\
+            2025.0  6.955525044816113e-13  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}

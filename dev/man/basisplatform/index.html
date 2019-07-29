@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Basis platform · BSplineExtension.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>BSplineExtension.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Manual</span><ul><li class="current"><a class="toctext" href>Basis platform</a><ul class="internal"><li><a class="toctext" href="#dimensional-1">1 dimensional</a></li><li><a class="toctext" href="#N-dimensional-1">N dimensional</a></li><li class="toplevel"><a class="toctext" href="#Function-approximation-1">Function approximation</a></li><li><a class="toctext" href="#Convergence-1">Convergence</a></li><li class="toplevel"><a class="toctext" href="#B-Spline-BasisPlatforms-Reference-1">B-Spline BasisPlatforms Reference</a></li></ul></li><li><a class="toctext" href="../1dextension/">1D extension platform</a></li><li><a class="toctext" href="../ndbsplineextension/">ND extension platform</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Manual</li><li><a href>Basis platform</a></li></ul><a class="edit-page" href="https://github.com/vincentcp/BSplineExtension.jl/blob/master/docs/src/man/basisplatform.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Basis platform</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Basis-platforms-1" href="#Basis-platforms-1">Basis platforms</a></h1><h2><a class="nav-anchor" id="dimensional-1" href="#dimensional-1">1 dimensional</a></h2><p>Three platforms of this package generate B-spline bases as primary dictionaries, but different dual dictionaries:</p><pre><code class="language-julia-repl">julia&gt; P1 = BSplinePlatform()
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Basis platform · BSplineExtension.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>BSplineExtension.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Manual</span><ul><li class="current"><a class="toctext" href>Basis platform</a><ul class="internal"><li><a class="toctext" href="#dimensional-B-spline-platforms-1">1 dimensional B-spline platforms</a></li><li><a class="toctext" href="#dimensional-generic-PET-platforms-1">1 dimensional generic PET platforms</a></li><li><a class="toctext" href="#N-dimensional-1">N dimensional</a></li><li class="toplevel"><a class="toctext" href="#Function-approximation-1">Function approximation</a></li><li><a class="toctext" href="#Convergence-1">Convergence</a></li><li class="toplevel"><a class="toctext" href="#B-Spline-BasisPlatforms-Reference-1">B-Spline BasisPlatforms Reference</a></li></ul></li><li><a class="toctext" href="../1dextension/">1D extension platform</a></li><li><a class="toctext" href="../ndbsplineextension/">ND extension platform</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Manual</li><li><a href>Basis platform</a></li></ul><a class="edit-page" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/master/docs/src/man/basisplatform.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Basis platform</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Basis-platforms-1" href="#Basis-platforms-1">Basis platforms</a></h1><h2><a class="nav-anchor" id="dimensional-B-spline-platforms-1" href="#dimensional-B-spline-platforms-1">1 dimensional B-spline platforms</a></h2><p>Three platforms of this package generate B-spline bases as primary dictionaries, but different dual dictionaries:</p><pre><code class="language-julia-repl">julia&gt; P1 = BSplinePlatform()
 BSplinePlatform{Float64,3}()
 
 julia&gt; P2 = EpsBSplinePlatform()
@@ -55,6 +55,55 @@ Equispaced translates of a discrete kernel dual to B-spline
     ↳ Float64 -&gt; Float64
     ↳ support = 0.0..1.0 (Unit)
     ↳ degree = 3
+    ↳ m = 2</code></pre><h2><a class="nav-anchor" id="dimensional-generic-PET-platforms-1" href="#dimensional-generic-PET-platforms-1">1 dimensional generic PET platforms</a></h2><p>Two platforms of the above are generalized to <code>PeriodicEquispacedTranslates</code>:</p><pre><code class="language-julia-repl">julia&gt; PET = BSplineTranslatesBasis(10,3,-1,1)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 10
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+julia&gt; P4 = PETPlatform(PET)
+PETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 10
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+)
+
+julia&gt; P5 = CDPETPlatform(PET)
+CDPETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 10
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+)
+
+julia&gt; dictionary(P4,100)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 100
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+julia&gt; dictionary(P5,100)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 100
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+julia&gt; azdual_dict(P4,100)
+Dictionary M * P
+
+P	:	Periodic equispaced translates of a periodic kernel function
+		    ↳ length = 100
+		    ↳ Float64 -&gt; Float64
+		    ↳ support = -1.0..1.0
+M	:	Multiplication by Circulant{Float64,Complex{Float64}}
+
+julia&gt; azdual_dict(P5,100)
+Equispaced translates of a discrete kernel dual
+    ↳ Periodic equispaced translates of a periodic kernel function
+      ↳ length = 100
+      ↳ Float64 -&gt; Float64
+      ↳ support = -1.0..1.0
     ↳ m = 2</code></pre><h2><a class="nav-anchor" id="N-dimensional-1" href="#N-dimensional-1">N dimensional</a></h2><pre><code class="language-julia-repl">julia&gt; P1 = NdBSplinePlatform((3,2))
 ProductPlatform{2}((BSplinePlatform{Float64,3}(), BSplinePlatform{Float64,2}()))
 
@@ -102,7 +151,7 @@ P	:	Periodic equispaced translates of B spline of degree 3
 		    ↳ degree = 3
 
 julia&gt; azdual_dict(P1,100)
-Dictionary (M₂ * P₂) ⊗ (M₁ * P₁)
+Dictionary (M₁ * P₂) ⊗ (M₂ * P₁)
 
 P₂	:	Periodic equispaced translates of B spline of degree 3
 		    ↳ length = 100
@@ -141,7 +190,7 @@ E	:	Equispaced translates of a discrete kernel dual to B-spline
 		    ↳ Float64 -&gt; Float64
 		    ↳ support = 0.0..1.0 (Unit)
 		    ↳ degree = 3
-		    ↳ m = 2</code></pre><h1><a class="nav-anchor" id="Function-approximation-1" href="#Function-approximation-1">Function approximation</a></h1><p>These duals are used to approximate functions if the <code>SolverStyle</code> option is equal to <code>DualStyle</code> (default):</p><p><a href="../figs/basis.pdf">[.pdf]</a>, <a href="../figs/basis.tex">[generated .tex]</a>, <a href="../figs/basis.tikz">[generated .tikz]</a></p><p><img src="../figs/basis.svg" alt/></p><h2><a class="nav-anchor" id="Convergence-1" href="#Convergence-1">Convergence</a></h2><p>The convergence curves show no difference between the different approaches:</p><p><a href="../figs/convergence_basis.pdf">[.pdf]</a>, <a href="../figs/convergence_basis.tex">[generated .tex]</a>, <a href="../figs/convergence_basis.tikz">[generated .tikz]</a></p><p><img src="../figs/convergence_basis.svg" alt/></p><h1><a class="nav-anchor" id="B-Spline-BasisPlatforms-Reference-1" href="#B-Spline-BasisPlatforms-Reference-1">B-Spline BasisPlatforms Reference</a></h1><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatform" href="#BSplineExtension.BSplinePlatform"><code>BSplineExtension.BSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct BSplinePlatform{T,D} &lt;: AbstractBSplinePlatform{T,D}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. The dual dictionaries are determined by the inverse of the Gram matrix.</p><p>See also: <a href="#BSplineExtension.EpsBSplinePlatform"><code>EpsBSplinePlatform</code></a>, <a href="#BSplineExtension.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = BSplinePlatform()
+		    ↳ m = 2</code></pre><h1><a class="nav-anchor" id="Function-approximation-1" href="#Function-approximation-1">Function approximation</a></h1><p>These duals are used to approximate functions if the <code>SolverStyle</code> option is equal to <code>DualStyle</code> (default):</p><p><a href="man/figs/basis.pdf">[.pdf]</a>, <a href="man/figs/basis.tex">[generated .tex]</a>, <a href="man/figs/basis.tikz">[generated .tikz]</a></p><p><img src="figs/basis.svg" alt/></p><h2><a class="nav-anchor" id="Convergence-1" href="#Convergence-1">Convergence</a></h2><p>The convergence curves show no difference between the different approaches:</p><p><a href="man/figs/convergence_basis.pdf">[.pdf]</a>, <a href="man/figs/convergence_basis.tex">[generated .tex]</a>, <a href="man/figs/convergence_basis.tikz">[generated .tikz]</a></p><p><img src="figs/convergence_basis.svg" alt/></p><h1><a class="nav-anchor" id="B-Spline-BasisPlatforms-Reference-1" href="#B-Spline-BasisPlatforms-Reference-1">B-Spline BasisPlatforms Reference</a></h1><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.BSplinePlatform" href="#BSplineExtension.BSplinePlatforms.BSplinePlatform"><code>BSplineExtension.BSplinePlatforms.BSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct BSplinePlatform{T,D} &lt;: AbstractPeriodicEquispacedTranslatesPlatform{T,T}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. The dual dictionaries are determined by the inverse of the Gram matrix.</p><p>See also: <a href="#BSplineExtension.BSplinePlatforms.EpsBSplinePlatform"><code>EpsBSplinePlatform</code></a>, <a href="#BSplineExtension.BSplinePlatforms.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = BSplinePlatform()
 BSplinePlatform{Float64,3}()
 
 julia&gt; g = sampling_grid(P,10)
@@ -174,7 +223,7 @@ M   :   Multiplication by Circulant{Float64,Complex{Float64}}
 
 
 julia&gt; mixedgramoperator(d1,d2,discretemeasure(g))≈IdentityOperator(d1,d2)
-true</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/AbstractBSplinePlatforms.jl#L10-L56">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.CDBSplinePlatform" href="#BSplineExtension.CDBSplinePlatform"><code>BSplineExtension.CDBSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct CDBSplinePlatform{T,D} &lt;: AbstractBSplinePlatform{T,D}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. Their duals dictionaries are compact, but discrete, i.e., their values are known in an <code>PeriodicEquispacedGrid</code></p><p>See also: <a href="#BSplineExtension.DiscreteBSplineDict"><code>DiscreteBSplineDict</code></a>, <a href="#BSplineExtension.BSplinePlatform"><code>BSplinePlatform</code></a>, <a href="#BSplineExtension.EpsBSplinePlatform"><code>EpsBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = CDBSplinePlatform(5)
+true</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/BSplinePlatforms.jl#L74-L120">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.CDBSplinePlatform" href="#BSplineExtension.BSplinePlatforms.CDBSplinePlatform"><code>BSplineExtension.BSplinePlatforms.CDBSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct CDBSplinePlatform{T,D} &lt;: AbstractCDPeriodicEquispacedTranslatesPlatform{T,T}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. Their duals dictionaries are compact, but discrete, i.e., their values are known in an <code>PeriodicEquispacedGrid</code></p><p>See also: <a href="man/@ref"><code>DiscreteBSplineDict</code></a>, <a href="#BSplineExtension.BSplinePlatforms.BSplinePlatform"><code>BSplinePlatform</code></a>, <a href="#BSplineExtension.BSplinePlatforms.EpsBSplinePlatform"><code>EpsBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = CDBSplinePlatform(5)
 CDBSplinePlatform{Float64,5}()
 
 julia&gt; d1 = dictionary(P,20)
@@ -204,7 +253,42 @@ M₁  :   Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 
 
 julia&gt; IdentityOperator(d1)≈g2
-true</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/AbstractBSplinePlatforms.jl#L138-L181">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.EpsBSplinePlatform" href="#BSplineExtension.EpsBSplinePlatform"><code>BSplineExtension.EpsBSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct EpsBSplinePlatform{T,D} &lt;: AbstractBSplinePlatform{T,D}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. The dual dictionaries are determined by the inverse of the Gram matrix. This Gram matrix has exponentially decaying elements. This platform truncates elemens lower <code>threshold</code> which results in a banded Gram.</p><p>See also: <a href="#BSplineExtension.BSplinePlatform"><code>BSplinePlatform</code></a>, <a href="#BSplineExtension.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = EpsBSplinePlatform()
+true</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/BSplinePlatforms.jl#L180-L223">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.CDPETPlatform" href="#BSplineExtension.BSplinePlatforms.CDPETPlatform"><code>BSplineExtension.BSplinePlatforms.CDPETPlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct CDPETPlatform{T,S,DICT&lt;:PeriodicEquispacedTranslates{T,S}} &lt;: AbstractCDPETPlatorm{T,S,DICT}</code></pre><p>A platform of periodic equispaced translates of a kernel. Their duals dictionaries are compact, but discrete, i.e., their values are known in an <code>PeriodicEquispacedGrid</code>. For some kernels these compact duals do not exist.</p><p>See also: <a href="#BSplineExtension.BSplinePlatforms.PETPlatform"><code>PETPlatform</code></a>, <a href="#BSplineExtension.BSplinePlatforms.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = CDPETPlatform(BSplineTranslatesBasis(6,3,-1,1))
+CDPETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+)
+
+julia&gt; d1 = dictionary(P,6)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+
+
+julia&gt; d2 = azdual_dict(P,6)
+Equispaced translates of a discrete kernel dual
+    ↳ Periodic equispaced translates of a periodic kernel function
+      ↳ length = 6
+      ↳ Float64 -&gt; Float64
+      ↳ support = -1.0..1.0
+    ↳ m = 2
+
+
+
+julia&gt; g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,6)))
+Operator M₁ * M₂
+
+M₂  :   Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
+M₁  :   Multiplication by BasisFunctions.HorizontalBandedMatrix{Float64}
+
+
+julia&gt; g2≈IdentityOperator(d1)
+true
+</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/BSplinePlatforms.jl#L300-L347">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.EpsBSplinePlatform" href="#BSplineExtension.BSplinePlatforms.EpsBSplinePlatform"><code>BSplineExtension.BSplinePlatforms.EpsBSplinePlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct EpsBSplinePlatform{T,D} &lt;: AbstractEpsPeriodicEquispacedTranslatesPlatform{T,T}</code></pre><p>A platform of equispaced periodic translates of B-spline of a given order. The dual dictionaries are determined by the inverse of the Gram matrix. This Gram matrix has exponentially decaying elements. This platform truncates elemens lower <code>threshold</code> which results in a banded Gram.</p><p>See also: <a href="#BSplineExtension.BSplinePlatforms.BSplinePlatform"><code>BSplinePlatform</code></a>, <a href="#BSplineExtension.BSplinePlatforms.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = EpsBSplinePlatform()
 EpsBSplinePlatform{Float64,3}()
 
 julia&gt; d1 = dictionary(P,1000)
@@ -233,31 +317,47 @@ M₁  :   Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 
 
 julia&gt; norm(IdentityOperator(d1)-g2)
-0.0004146509264381403</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/AbstractBSplinePlatforms.jl#L64-L107">source</a></section><p>The dual dictionary used in <a href="#BSplineExtension.CDBSplinePlatform"><code>CDBSplinePlatform</code></a> is</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.DiscreteBSplineDict" href="#BSplineExtension.DiscreteBSplineDict"><code>BSplineExtension.DiscreteBSplineDict</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct DiscreteBSplineDict{T,K} &lt;: PeriodicBSplineBasis{T,K}</code></pre><p>Compact, discrete, periodic dual –- with respect to a <code>DiracCombMeasure</code> –- to the B-spline basis consisting of equispaced periodic translates of a B-spline (see <code>BSplineTranslatesBasis</code> of <code>CompactTranslatesDict</code>).</p><p>Since this basis is discrete, it can only be evaluated in an <code>PeriodicEquispacedGrid</code>.</p><p>Used in <a href="#BSplineExtension.CDBSplinePlatform"><code>CDBSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; B = DiscreteBSplineDict(3,2,10)
-Equispaced translates of a discrete kernel dual to B-spline
-    ↳ length = 10
+0.0004146509264381403</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/BSplinePlatforms.jl#L129-L172">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.PETPlatform" href="#BSplineExtension.BSplinePlatforms.PETPlatform"><code>BSplineExtension.BSplinePlatforms.PETPlatform</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct PETPlatform{T,S,DICT&lt;:PeriodicEquispacedTranslates{T,S}} &lt;: AbstractPETPlatorm{T,S,DICT}</code></pre><p>A platform of periodic equispaced translates of a kernel.</p><p>See also: <a href="#BSplineExtension.BSplinePlatforms.CDPETPlatform"><code>CDPETPlatform</code></a>, <a href="#BSplineExtension.BSplinePlatforms.BSplinePlatform"><code>BSplinePlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; P = PETPlatform(BSplineTranslatesBasis(6,3,-1,1))
+PETPlatform{Float64,Float64,GenericPeriodicEquispacedTranslates{Float64,Float64}}(Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
     ↳ Float64 -&gt; Float64
-    ↳ support = 0.0..1.0 (Unit)
-    ↳ degree = 3
+    ↳ support = -1.0..1.0
+
+)
+
+julia&gt; d1 = dictionary(P,6)
+Periodic equispaced translates of a periodic kernel function
+    ↳ length = 6
+    ↳ Float64 -&gt; Float64
+    ↳ support = -1.0..1.0
+
+
+
+julia&gt; d2 = azdual_dict(P,6)
+Dictionary M * P
+
+P   :   Periodic equispaced translates of a periodic kernel function
+            ↳ length = 6
+            ↳ Float64 -&gt; Float64
+            ↳ support = -1.0..1.0
+M   :   Multiplication by Circulant{Float64,Complex{Float64}}
+
+
+julia&gt; g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,6)))
+Multiplication by Circulant{Float64,Complex{Float64}}
+
+
+
+julia&gt; g2≈IdentityOperator(d1)
+true</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/BSplinePlatforms.jl#L252-L294">source</a></section><p>The dual dictionary used in <a href="#BSplineExtension.BSplinePlatforms.CDBSplinePlatform"><code>CDBSplinePlatform</code></a> is</p><p>and the one used in <a href="#BSplineExtension.BSplinePlatforms.CDPETPlatform"><code>CDPETPlatform</code></a> is</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals.CompactPeriodicEquispacedTranslatesDual" href="#BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals.CompactPeriodicEquispacedTranslatesDual"><code>BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals.CompactPeriodicEquispacedTranslatesDual</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">struct CompactPeriodicEquispacedTranslatesDual{T,K} &lt;: PeriodicEquispacedTranslates{T,K}</code></pre><p>Compact, discrete, periodic dual –- with respect to a <code>DiracCombMeasure</code> –- to the a dictionary consisting of equispaced periodic translates of a kernel (see <code>PeriodicEquispacedTranslates</code> of <code>CompactTranslatesDict</code>).</p><p>Since this basis is discrete, it can only be evaluated in an <code>PeriodicEquispacedGrid</code>.</p><p>Used in <a href="man/@ref"><code>CDPETPlatform</code></a></p><p><strong>Example</strong></p><pre><code class="language-jldocs">julia&gt; using BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals, CompactTranslatesDict
+
+julia&gt; B = CompactPeriodicEquispacedTranslatesDual(BSplineTranslatesBasis(10,3,-1,1), 2)
+Equispaced translates of a discrete kernel dual
+    ↳ Periodic equispaced translates of a periodic kernel function
+      ↳ length = 10
+      ↳ Float64 -&gt; Float64
+      ↳ support = -1.0..1.0
     ↳ m = 2
 
-
-
-julia&gt; A = evaluation_operator(B, PeriodicEquispacedGrid(10, support(B)))
-Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
-
-
-
-julia&gt; Matrix(A)
-10×10 Array{Float64,2}:
-  0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734
- -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106
-  0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352
-  0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0          0.0
-  0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0          0.0
-  0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352   0.0
-  0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106      0.00547352
-  0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734      0.11106
-  0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283     -0.17734
- -0.17734      0.11106      0.00547352   0.0          0.0          0.0          0.00547352   0.11106     -0.17734      0.38283
-</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/DiscreteBSplineDicts.jl#L11-L53">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/ndplatforms.jl#L2-L6">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdCDBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdCDBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdCDBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdCDBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/ndplatforms.jl#L20-L24">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdEpsBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdEpsBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdEpsBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdEpsBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/vincentcp/BSplineExtension.jl/blob/58b3c4fc60df603ebe532f15fb0efd5f0d636729/src/platforms/ndplatforms.jl#L11-L15">source</a></section><footer><hr/><a class="previous" href="../../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../1dextension/"><span class="direction">Next</span><span class="title">1D extension platform</span></a></footer></article></body></html>
+julia&gt; A = evaluation_operator(B, PeriodicEquispacedGrid(10, BasisFunctions.support(B)))
+Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/CompactPeriodicEquispacedTranslatesDuals.jl#L17-L43">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/ndplatforms.jl#L2-L6">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdCDBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdCDBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdCDBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdCDBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/ndplatforms.jl#L20-L24">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="BSplineExtension.NdEpsBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N" href="#BSplineExtension.NdEpsBSplinePlatform-Union{Tuple{Tuple{Vararg{Int64,N}}}, Tuple{N}, Tuple{Tuple{Vararg{Int64,N}},Any}} where N"><code>BSplineExtension.NdEpsBSplinePlatform</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">NdEpsBSplinePlatform(orders::NTuple{N,Int), types=ntuple(k=&gt;BSplinePlatform, Val(N))) where N</code></pre><p>Return a ProductPlatform that has B-spline platforms of type <code>types</code> and order <code>orders</code> as its elements.</p></div></div><a class="source-link" target="_blank" href="https://github.com/FrameFunVC/BSplineExtension.jl/blob/d52cec911e8b2b6e26e55feb38bbec7574d6c852/src/platforms/ndplatforms.jl#L11-L15">source</a></section><footer><hr/><a class="previous" href="../../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../1dextension/"><span class="direction">Next</span><span class="title">1D extension platform</span></a></footer></article></body></html>

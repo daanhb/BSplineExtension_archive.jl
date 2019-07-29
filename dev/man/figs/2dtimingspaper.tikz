@@ -1,14 +1,14 @@
 \begin{tikzpicture}
 \begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
-    \nextgroupplot[ymin={0.01}, ymax={100.0}, xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={BSplinePlatform}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, ymin={0.01}, ymax={100.0}]
     \addplot[color={blue}, mark={o}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.021219331  \\
-            576.0  0.071246832  \\
-            2304.0  0.594155219  \\
-            9216.0  8.11138531  \\
+            144.0  0.02072781  \\
+            576.0  0.061130652  \\
+            2304.0  0.267151103  \\
+            9216.0  2.688736349  \\
         }
         ;
     \addlegendentry {m=1}
@@ -16,10 +16,10 @@
         table[row sep={\\}]
         {
             \\
-            144.0  0.024897886  \\
-            576.0  0.103851254  \\
-            2304.0  0.932120141  \\
-            9216.0  13.760084437  \\
+            144.0  0.013609083  \\
+            576.0  0.121469384  \\
+            2304.0  1.104482044  \\
+            9216.0  5.018249367  \\
         }
         ;
     \addlegendentry {m=2}
@@ -27,10 +27,10 @@
         table[row sep={\\}]
         {
             \\
-            144.0  0.027139943  \\
-            576.0  0.126832495  \\
-            2304.0  1.257835115  \\
-            9216.0  17.777437735  \\
+            144.0  0.017350029  \\
+            576.0  0.117697342  \\
+            2304.0  1.439637935  \\
+            9216.0  27.027954344  \\
         }
         ;
     \addlegendentry {m=3}
@@ -38,10 +38,10 @@
         table[row sep={\\}]
         {
             \\
-            144.0  0.034061117  \\
-            576.0  0.192578512  \\
-            2304.0  1.664656893  \\
-            9216.0  23.787127614  \\
+            144.0  0.024545103  \\
+            576.0  0.194653598  \\
+            2304.0  2.125454434  \\
+            9216.0  30.0791969  \\
         }
         ;
     \addlegendentry {m=4}
@@ -56,45 +56,45 @@
         }
         ;
     \addlegendentry {$\mathcal O(N^\frac{3}{2})$}
-    \nextgroupplot[ymin={0.01}, ymax={100.0}, xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={EpsBSplinePlatform}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, ymin={0.01}, ymax={100.0}]
     \addplot[color={blue}, mark={o}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.029514763  \\
-            576.0  0.108227328  \\
-            2304.0  0.250623836  \\
-            9216.0  2.024741872  \\
+            144.0  0.010414526  \\
+            576.0  0.026336924  \\
+            2304.0  0.137095289  \\
+            9216.0  0.84955328  \\
         }
         ;
     \addplot[color={red}, mark={square}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.031217556  \\
-            576.0  0.122220282  \\
-            2304.0  1.19304262  \\
-            9216.0  4.597788504  \\
+            144.0  0.013252783  \\
+            576.0  0.056900969  \\
+            2304.0  0.235901156  \\
+            9216.0  2.227664409  \\
         }
         ;
     \addplot[color={brown}, mark={diamond}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.036149274  \\
-            576.0  0.144881755  \\
-            2304.0  1.47897432  \\
-            9216.0  20.043311521  \\
+            144.0  0.01675843  \\
+            576.0  0.063234007  \\
+            2304.0  0.321216783  \\
+            9216.0  2.713146981  \\
         }
         ;
     \addplot[color={black}, mark={x}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.041364546  \\
-            576.0  0.245103351  \\
-            2304.0  2.142844734  \\
-            9216.0  25.646437954  \\
+            144.0  0.021691835  \\
+            576.0  0.100446719  \\
+            2304.0  0.515006477  \\
+            9216.0  4.567839446  \\
         }
         ;
     \addplot[color={black}, dashed]
@@ -107,45 +107,45 @@
             9216.0  44.2368  \\
         }
         ;
-    \nextgroupplot[ymin={0.01}, ymax={100.0}, xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, title={CDBSplinePlatform}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}, ymin={0.01}, ymax={100.0}]
     \addplot[color={blue}, mark={o}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.0257545  \\
-            576.0  0.039802279  \\
-            2304.0  0.189192223  \\
-            9216.0  0.856397694  \\
+            144.0  0.029655551  \\
+            576.0  0.018703818  \\
+            2304.0  0.048597173  \\
+            9216.0  0.408254227  \\
         }
         ;
     \addplot[color={red}, mark={square}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.03074855  \\
-            576.0  0.074848226  \\
-            2304.0  0.276902959  \\
-            9216.0  1.879293874  \\
+            144.0  0.015113333  \\
+            576.0  0.064995471  \\
+            2304.0  0.388518846  \\
+            9216.0  2.160560862  \\
         }
         ;
     \addplot[color={brown}, mark={diamond}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.027325677  \\
-            576.0  0.07259153  \\
-            2304.0  0.363904378  \\
-            9216.0  2.95897538  \\
+            144.0  0.023231708  \\
+            576.0  0.093379615  \\
+            2304.0  0.718929509  \\
+            9216.0  2.298552911  \\
         }
         ;
     \addplot[color={black}, mark={x}, mark options={solid}]
         table[row sep={\\}]
         {
             \\
-            144.0  0.033406097  \\
-            576.0  0.113381489  \\
-            2304.0  0.559044079  \\
-            9216.0  4.421824468  \\
+            144.0  0.032552794  \\
+            576.0  0.258109996  \\
+            2304.0  1.822559498  \\
+            9216.0  4.813991976  \\
         }
         ;
     \addplot[color={black}, dashed]
