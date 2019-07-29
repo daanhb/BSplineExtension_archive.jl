@@ -8,20 +8,71 @@ import FrameFun.FrameFunInterface: correct_sampling_parameter, regularization_th
 import FrameFun: dictionary
 
 
-abstract type AbstractPeriodicEquispacedTranslatesPlatform <: BasisPlatform end
+abstract type AbstractPeriodicEquispacedTranslatesPlatform{T,S} <: BasisPlatform end
 
 SolverStyle(p::AbstractPeriodicEquispacedTranslatesPlatform, ::SamplingStyle) = DualStyle()
 correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param, L; options...) = error()
 correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param::Int, L::Int; options...) =
     (round(Int, L/param) * param)
 
-abstract type AbstractBSplinePlatform{T,D} <: AbstractPeriodicEquispacedTranslatesPlatform end
-dictionary(p::AbstractBSplinePlatform{T,D}, n::Int) where {T,D} = BSplineTranslatesBasis{T,D}(n)
+abstract type AbstractEpsPeriodicEquispacedTranslatesPlatform{T,S} <: AbstractPeriodicEquispacedTranslatesPlatform{T,S} end
+
+function dualdictionary(platform::AbstractEpsPeriodicEquispacedTranslatesPlatform{T}, param, measure::Measure;
+        threshold=regularization_threshold(T), options...) where T
+    dual = gramdual(dictionary(platform, param), measure;options...)
+    op = BasisFunctions.operator(dual)
+    @assert op isa CirculantOperator
+
+    # Get the abs of the first row to determine the bandwidth
+    e = zeros(src(op)); e[1] = 1
+    column = op*e
+    # bandwidth determined by threshold
+    # we want \|I-G (G̃+E)\|< threshold, therefore \|E\| < threshold / \|G\|
+    mask = abs.(column) .< threshold / norm(inv(op).A.vcvr_dft,Inf)
+    bw = (findfirst(mask), findlast(mask))
+    if bw[1] == nothing
+        return dual
+    end
+    bw = bw[1]-1,bw[2]+1
+    a = [column[bw[2]:end];column[1:bw[1]]]
+    # Create bandlimited operator (which is also circulant)
+    op_replace = VerticalBandedOperator(src(op), dest(op), a, 1, -1+bw[2]-length(dual))
+    op_replace*src(op)
+end
+
+abstract type AbstractCDPeriodicEquispacedTranslatesPlatform{T,S}<: AbstractPeriodicEquispacedTranslatesPlatform{T,S} end
+include("CompactPeriodicEquispacedTranslatesDuals.jl")
+
+SamplingStyle(::AbstractCDPeriodicEquispacedTranslatesPlatform) = OversamplingStyle()
+
+
+dualdictionary(platform::AbstractCDPeriodicEquispacedTranslatesPlatform, param, measure::Measure; options...) =
+    error("No azdual_dict for `CDBSplinePlatform` and $(typeof(measure))")
+
+function dualdictionary(platform::AbstractCDPeriodicEquispacedTranslatesPlatform, param, measure::UniformDiracCombMeasure;
+        options...)
+    dict = dictionary(platform, param)
+    g = grid(measure)
+    @assert support(dict) ≈ support(g)
+    m = length(g) / length(dict)
+    @assert round(Int,m) ≈ m
+    m = round(Int, m)
+    if m == 1
+        @warn "No compact dual possible, try oversampling"
+        return dual(dict, measure; options...)
+    else
+        if isperiodic(g)
+            return CompactPeriodicEquispacedTranslatesDual(dict, m)
+        else
+            error()
+        end
+    end
+end
 
 
 export BSplinePlatform
 """
-    struct BSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+    struct BSplinePlatform{T,D} <: AbstractPeriodicEquispacedTranslatesPlatform{T,T}
 
 A platform of equispaced periodic translates of B-spline of a given order.
 The dual dictionaries are determined by the inverse of the Gram matrix.
@@ -67,15 +118,16 @@ julia> mixedgramoperator(d1,d2,discretemeasure(g))≈IdentityOperator(d1,d2)
 true
 ```
 """
-struct BSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+struct BSplinePlatform{T,D} <: AbstractPeriodicEquispacedTranslatesPlatform{T,T}
 end
 
 BSplinePlatform(degree::Int=3) = BSplinePlatform{Float64,degree}()
+dictionary(platform::BSplinePlatform{T,D}, param::Int) where {T,D} = BSplineTranslatesBasis{T,D}(param)
 
 
 export EpsBSplinePlatform
 """
-    struct EpsBSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+    struct EpsBSplinePlatform{T,D} <: AbstractEpsPeriodicEquispacedTranslatesPlatform{T,T}
 
 A platform of equispaced periodic translates of B-spline of a given order.
 The dual dictionaries are determined by the inverse of the Gram matrix. This Gram
@@ -118,37 +170,15 @@ julia> norm(IdentityOperator(d1)-g2)
 0.0004146509264381403
 ```
 """
-struct EpsBSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+struct EpsBSplinePlatform{T,D} <: AbstractEpsPeriodicEquispacedTranslatesPlatform{T,T}
 end
 
 EpsBSplinePlatform(degree::Int=3) = EpsBSplinePlatform{Float64,degree}()
-
-function dualdictionary(platform::EpsBSplinePlatform{T}, param, measure::Measure;
-        threshold=regularization_threshold(T), options...) where T
-    dual = gramdual(dictionary(platform, param), measure;options...)
-    op = BasisFunctions.operator(dual)
-    @assert op isa CirculantOperator
-
-    # Get the abs of the first row to determine the bandwidth
-    e = zeros(src(op)); e[1] = 1
-    column = op*e
-    # bandwidth determined by threshold
-    # we want \|I-G (G̃+E)\|< threshold, therefore \|E\| < threshold / \|G\|
-    mask = abs.(column) .< threshold / norm(inv(op).A.vcvr_dft,Inf)
-    bw = (findfirst(mask), findlast(mask))
-    if bw[1] == nothing
-        return dual
-    end
-    bw = bw[1]-1,bw[2]+1
-    a = [column[bw[2]:end];column[1:bw[1]]]
-    # Create bandlimited operator (which is also circulant)
-    op_replace = VerticalBandedOperator(src(op), dest(op), a, 1, -1+bw[2]-length(dual))
-    op_replace*src(op)
-end
+dictionary(platform::EpsBSplinePlatform{T,D}, param::Int) where {T,D} = BSplineTranslatesBasis{T,D}(param)
 
 export CDBSplinePlatform
 """
-    struct CDBSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+    struct CDBSplinePlatform{T,D} <: AbstractCDPeriodicEquispacedTranslatesPlatform{T,T}
 
 A platform of equispaced periodic translates of B-spline of a given order.
 Their duals dictionaries are compact, but discrete, i.e.,
@@ -191,42 +221,32 @@ julia> IdentityOperator(d1)≈g2
 true
 ```
 """
-struct CDBSplinePlatform{T,D} <: AbstractBSplinePlatform{T,D}
+struct CDBSplinePlatform{T,D} <: AbstractCDPeriodicEquispacedTranslatesPlatform{T,T}
 end
 
 CDBSplinePlatform(degree::Int=3) = CDBSplinePlatform{Float64,degree}()
+dictionary(platform::CDBSplinePlatform{T,D}, param::Int) where {T,D} = BSplineTranslatesBasis{T,D}(param)
 
-SamplingStyle(::CDBSplinePlatform) = OversamplingStyle()
-include("DiscreteBSplineDicts.jl")
-
-dualdictionary(platform::CDBSplinePlatform, param, measure::Measure; options...) =
-    error("No azdual_dict for `CDBSplinePlatform` and $(typeof(measure))")
-
-function dualdictionary(platform::CDBSplinePlatform, param, measure::UniformDiracCombMeasure;
-        options...)
-    dict = dictionary(platform, param)
-    g = grid(measure)
-    @assert support(dict) ≈ support(g)
-    m = length(g) / length(dict)
-    @assert round(Int,m) ≈ m
-    m = round(Int, m)
-    if m == 1
-        @warn "No compact dual possible, try oversampling"
-        return dual(dict, measure; options...)
-    else
-        if g isa PeriodicEquispacedGrid
-            return DiscreteBSplineDict(degree(dict), m, length(dict))
-        else
-            return DiscreteBSplineDict(degree(dict), m, length(dict))
-        end
-    end
+export GaussSplinePlatform, CDGaussSplinePlatform
+struct GaussSplinePlatform{T,D} <: AbstractPeriodicEquispacedTranslatesPlatform{T,T}
 end
+GaussSplinePlatform(degree::Int=3) = GaussSplinePlatform{Float64,degree}()
+dictionary(platform::GaussSplinePlatform{T,D}, param::Int) where {T,D} = GaussTranslatesBasis{T,D}(param)
+
+struct CDGaussSplinePlatform{T,D} <: AbstractCDPeriodicEquispacedTranslatesPlatform{T,T}
+end
+CDGaussSplinePlatform(degree::Int=3) = CDGaussSplinePlatform{Float64,degree}()
+dictionary(platform::CDGaussSplinePlatform{T,D}, param::Int) where {T,D} = GaussTranslatesBasis{T,D}(param)
+
+
 
 using CompactTranslatesDict: PeriodicEquispacedTranslates
-abstract type AbstractPETPlatorm{T,S,DICT} <: AbstractPeriodicEquispacedTranslatesPlatform end
-abstract type AbstractCDPETPlatorm{T,S,DICT} <: AbstractPETPlatorm{T,S,DICT} end
+abstract type AbstractPETPlatorm{T,S,DICT} <: AbstractPeriodicEquispacedTranslatesPlatform{T,S} end
+abstract type AbstractCDPETPlatorm{T,S,DICT} <: AbstractCDPeriodicEquispacedTranslatesPlatform{T,S} end
 dictionary(platform::AbstractPETPlatorm, param) = similar(platform.dict, param)
+dictionary(platform::AbstractCDPETPlatorm, param) = similar(platform.dict, param)
 SamplingStyle(::AbstractPETPlatorm) = OversamplingStyle()
+SamplingStyle(::AbstractCDPETPlatorm) = OversamplingStyle()
 
 export PETPlatform
 """
@@ -275,8 +295,6 @@ true
 struct PETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractPETPlatorm{T,S,DICT}
     dict    :: DICT
 end
-
-PETPlatform(degree::Int=3) = BSplinePlatform{Float64,degree}()
 
 export CDPETPlatform
 """
@@ -331,31 +349,7 @@ struct CDPETPlatform{T,S,DICT<:PeriodicEquispacedTranslates{T,S}} <: AbstractCDP
     dict    :: DICT
 end
 
-include("CompactPeriodicEquispacedTranslatesDuals.jl")
+# include("CompactPeriodicEquispacedTranslatesDuals.jl")
 using .CompactPeriodicEquispacedTranslatesDuals
-
-dualdictionary(platform::AbstractCDPETPlatorm, param, measure::Measure; options...) =
-    error("No azdual_dict for $(typeof(platform)) and $(typeof(measure))")
-
-function dualdictionary(platform::AbstractCDPETPlatorm, param, measure::UniformDiracCombMeasure;
-        options...)
-    dict = dictionary(platform, param)
-    g = grid(measure)
-    @assert support(dict) ≈ support(g)
-    m = length(g) / length(dict)
-    @assert round(Int,m) ≈ m
-    m = round(Int, m)
-    if m == 1
-        @warn "No compact dual possible, try oversampling"
-        return dual(dict, measure; options...)
-    else
-        if isperiodic(g)
-            return CompactPeriodicEquispacedTranslatesDual(dict, m)
-        else
-            error()
-        end
-    end
-end
-
 
 end

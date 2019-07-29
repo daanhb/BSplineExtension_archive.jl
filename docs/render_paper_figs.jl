@@ -100,8 +100,9 @@ all=false
 
 
 
-f = (x,y,z)->exp(x*y*y)
-Ns1 = round.(Int,exp.(LinRange(log.((1000 ,100000))...,4)).^(.33))
+f = (x,y,z)->exp(x*y*z)
+exp.(LinRange(log.((1000 ,1000000))...,6))
+Ns1 = round.(Int,exp.(LinRange(log.((1000 ,1000000))...,6)).^(.33))
 Ns2 = round.(Int,exp.(LinRange(log.((1000 ,100000))...,4)).^(.33))
 ds = 1:4 # hide
 errors = Array{Float64}(undef, 3, length(ds), length(Ns1)) # hide

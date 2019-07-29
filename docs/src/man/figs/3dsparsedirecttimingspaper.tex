@@ -1,0 +1,174 @@
+\RequirePackage{luatex85}
+\documentclass[tikz]{standalone}
+% Default preamble
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{smithchart}
+\usepgfplotslibrary{statistics}
+\usepgfplotslibrary{dateplot}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[ymin={0}, group style={group size={3 by 1}}]
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.08205973  \\
+            4096.0  0.841202369  \\
+            19683.0  34.962288846  \\
+            91125.0  232.737956823  \\
+        }
+        ;
+    \addlegendentry {m=1}
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.207966223  \\
+            4096.0  2.091017455  \\
+            19683.0  93.054419242  \\
+            91125.0  772.529793882  \\
+        }
+        ;
+    \addlegendentry {m=2}
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.564448581  \\
+            4096.0  6.551542295  \\
+            19683.0  247.527741097  \\
+            91125.0  2000.417841294  \\
+        }
+        ;
+    \addlegendentry {m=3}
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  1.084691193  \\
+            4096.0  9.818806133  \\
+            19683.0  408.738996007  \\
+            91125.0  2911.263820139  \\
+        }
+        ;
+    \addlegendentry {m=4}
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  50.0  \\
+            4096.0  838.8608  \\
+            19683.0  19371.02445  \\
+            91125.0  415188.28125  \\
+        }
+        ;
+    \addlegendentry {$\mathcal O(N^2)$}
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  2.534442582  \\
+            4096.0  0.357020173  \\
+            19683.0  8.915343459  \\
+            91125.0  10.442989336  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.413808218  \\
+            4096.0  2.248092379  \\
+            19683.0  65.303138118  \\
+            91125.0  132.07716437  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.788511212  \\
+            4096.0  4.103584245  \\
+            19683.0  143.587024008  \\
+            91125.0  307.420818799  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  1.297577934  \\
+            4096.0  9.545163907  \\
+            19683.0  621.942222947  \\
+            91125.0  918.687565925  \\
+        }
+        ;
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  50.0  \\
+            4096.0  838.8608  \\
+            19683.0  19371.02445  \\
+            91125.0  415188.28125  \\
+        }
+        ;
+    \nextgroupplot[xmode={log}, ymode={log}, xlabel={N}, legend pos={north west}]
+    \addplot[color={blue}, mark={o}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.019835436  \\
+            4096.0  0.043199534  \\
+            19683.0  1.622290737  \\
+            91125.0  3.834788431  \\
+        }
+        ;
+    \addplot[color={red}, mark={square}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.030988869  \\
+            4096.0  0.15308845  \\
+            19683.0  12.867998717  \\
+            91125.0  9.632018192  \\
+        }
+        ;
+    \addplot[color={brown}, mark={diamond}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.121886031  \\
+            4096.0  0.391431117  \\
+            19683.0  11.343941615  \\
+            91125.0  34.080004063  \\
+        }
+        ;
+    \addplot[color={black}, mark={x}, mark options={solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  0.113319035  \\
+            4096.0  0.591551485  \\
+            19683.0  61.769151601  \\
+            91125.0  163.489300214  \\
+        }
+        ;
+    \addplot[color={black}, dashed]
+        table[row sep={\\}]
+        {
+            \\
+            1000.0  50.0  \\
+            4096.0  838.8608  \\
+            19683.0  19371.02445  \\
+            91125.0  415188.28125  \\
+        }
+        ;
+\end{groupplot}
+\end{tikzpicture}
+\end{document}

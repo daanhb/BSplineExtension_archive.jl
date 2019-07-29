@@ -5,12 +5,10 @@ using BSplineExtension, Test
     P = NdBSplinePlatform((1,3))
     B = dictionary(P,(10,10))
 
-
     d1 = dictionary(P,(10,10))
     d2 = azdual_dict(P,(10,10))
 
     g1 = mixedgramoperator(d1, d2)
-    sampling_grid(P,(10,10))
     g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,(10,10))))
     all(isa.(elements(g1), CirculantOperator))
     @test all(isa.(elements(g1), CirculantOperator))

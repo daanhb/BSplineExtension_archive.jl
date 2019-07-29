@@ -33,7 +33,7 @@ using BSplineExtension.FrameFun.ApproximationProblems: approximationproblem
     P = CDBSplinePlatform(5)
     d1 = dictionary(P,20)
     d2 = azdual_dict(P,20)
-    @test d2 isa DiscreteBSplineDict
+    @test d2 isa BSplineExtension.BSplinePlatforms.CompactPeriodicEquispacedTranslatesDuals.CompactPeriodicEquispacedTranslatesDual
     g2 = mixedgramoperator(d1, d2, discretemeasure(sampling_grid(P,20)))
     @test IdentityOperator(d1)≈g2
 

@@ -21,9 +21,9 @@ using BSplineExtension, Test
     @test all(rowsizes[:,4,:,:] .== 10)
 
     # Test CDBSplinePlatform
-    @test all(20 .<= colsizes[3,1,:,1] .<= 27)
+    @test all(19 .<= colsizes[3,1,:,1] .<= 27)
     @test all(8 .<= colsizes[3,1,:,2] .<= 8)
-    @test all(28 .<= colsizes[3,2,:,1] .<= 35)
+    @test all(28 .<= colsizes[3,2,:,1] .<= 36)
     @test all(20 .<= colsizes[3,2,:,2] .<= 20)
     @test all(36 .<= colsizes[3,4,:,2] .<= 36)
     @test all(62 .<= colsizes[3,4,:,1][2:end] .<= 64)

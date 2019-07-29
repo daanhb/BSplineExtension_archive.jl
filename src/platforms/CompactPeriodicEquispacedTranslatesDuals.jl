@@ -108,7 +108,7 @@ end
 signal(dict::PeriodicEquispacedTranslates, m::Int) =
     signal(x->eval_kernel(dict, x), kernel_support(dict), support(dict), m*length(dict), translationgrid(dict)[1])
 
-function signal(kernel, kernel_support::Interval, support::Interval, m::Int, y)
+function signal(kernel, kernel_support::AbstractInterval, support::AbstractInterval, m::Int, y)
     l, r = extrema(support)
     width = r-l
     step = width/m
