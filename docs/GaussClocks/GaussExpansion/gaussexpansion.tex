@@ -1,0 +1,144 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{mymath}
+
+\title{}
+\author{Vincent Copp\'e}
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+
+We are interested in the near flat regime of the radial basis function periodic interval $[0,2\pi)$. Therefore we use radial basis functions on the sphere $S^1$
+\begin{equation}
+\phi(\theta;\theta_0) = \phi_\epsilon(t) = \psi_\epsilon(\sqrt{2-2t}),\quad t\in [-1,1]
+\end{equation}
+with t = $\cos(\theta-\theta_0)=x^Tx_0, x=e^{i\theta}, x_0=e^{i\theta_0},\theta,\theta_0\in\mathbb R$ and $\psi_\epsilon(r): [0,\infty)\rightarrow\mathbb R$ is the usual radial basis function. Hubbert and Baxter \cite{Hubbert2001} give analytic expressions for the Fourier coefficients $c_{k,\epsilon}$ in 
+\begin{equation}\label{eq:infexpansion}
+	\phi_\epsilon(t) = c_{k,\epsilon} + \sum_{k=1}^\infty\epsilon^{2k}c_{k,\epsilon}\left(e^{i\theta}e^{-i\theta_0}+e^{-i\theta}e^{i\theta_0}\right)
+\end{equation}
+
+For Gaussians, i.e., 
+\begin{equation}
+	\phi_\epsilon(t) = e^{-\epsilon^2(2-2t)},
+\end{equation}
+these coefficients are 
+\begin{equation}
+c_{0,\epsilon} =0,\quad
+	c_{k,\epsilon} = \frac{kI_k(2\epsilon^2)e^{-2\epsilon^2}}{\epsilon^{2k}}
+\end{equation}
+where $I_k$ is the modified Bessel function of the first kind. These coefficients converge to finite numbers when $\epsilon$ grows small.  Since $I_k(z)\sim \tfrac{(z/2)^k}{\Gamma(k+1)}$ for small $z$ (HMF, ...), $\lim_{\epsilon\searrow0}c_{k,\epsilon}=\frac{1}{\Gamma(k)}$.
+
+Keeping only the first $K$ terms of \eqref{eq:infexpansion} and filling in $x_m=2\pi m/M$ and $x_n=2\pi n/N$, the vector of basis elements can be written as
+
+%\begin{equation}
+%	\begin{bmatrix}
+%		\phi(x_m;x_0)\\
+%		\phi(x_m;x_1)\\
+%		\vdots\\
+%		\phi(x_m;x_{N-2})\\
+%		\phi(x_m;x_{N-1})
+%	\end{bmatrix}
+%	= 
+%	\begin{bmatrix}
+%	\epsilon^0c_{0,\epsilon}e^{i0x_0}&\epsilon^2c_{1,\epsilon}e^{-ix_0}&\cdots&\epsilon^{2K}c_{K,\epsilon}e^{-iKx_0}&\epsilon^{2K}c_{K,\epsilon}e^{iKx_0}&\cdots&\epsilon^{4\epsilon}c_{2,\epsilon}e^{i2x_0}&\epsilon^{2}c_{1,\epsilon}e^{i1x_0}\\
+%	\epsilon^0c_{0,\epsilon}e^{i0x_1}&\epsilon^2c_{1,\epsilon}e^{-ix_1}&\cdots&\epsilon^{2K}c_{K,\epsilon}e^{-iKx_1}&\epsilon^{2K}c_{K,\epsilon}e^{iKx_1}&\cdots&\epsilon^{4\epsilon}c_{2,\epsilon}e^{i2x_1}&\epsilon^{2}c_{1,\epsilon}e^{i1x_1}\\
+%	\vdots&\vdots&&\vdots&\vdots&&\vdots&\vdots\\
+%	\epsilon^0c_{0,\epsilon}e^{i0x_{N-2}}&\epsilon^2c_{1,\epsilon}e^{-ix_{N-2}}&\cdots&\epsilon^{2K}c_{K,\epsilon}e^{-iKx_{N-2}}&\epsilon^{2K}c_{K,\epsilon}e^{iKx_{N-2}}&\cdots&\epsilon^{4\epsilon}c_{2,\epsilon}e^{i2x_{N-2}}&\epsilon^{2}c_{1,\epsilon}e^{i1x_{N-2}}\\
+%	\epsilon^0c_{0,\epsilon}e^{i0x_{N-1}}&\epsilon^2c_{1,\epsilon}e^{-ix_{N-1}}&\cdots&\epsilon^{2K}c_{K,\epsilon}e^{-iKx_{N-1}}&\epsilon^{2K}c_{K,\epsilon}e^{iKx_{N-1}}&\cdots&\epsilon^{4\epsilon}c_{2,\epsilon}e^{i2x_{N-1}}&\epsilon^{2}c_{1,\epsilon}e^{i1x_{N-1}}
+%	\end{bmatrix}
+%	\begin{bmatrix}
+%	e^{i0x_m}\\
+%	e^{i1x_m}\\
+%	\vdots\\
+%	e^{-i2x_m}\\
+%	e^{-i1x_m}
+%	\end{bmatrix}
+%\end{equation}
+\begin{equation}
+\begin{bmatrix}
+\phi(\tfrac{2\pi m}{M};\tfrac{2\pi 0}{N})\\
+\phi(\tfrac{2\pi m}{M};\tfrac{2\pi 1}{N})\\
+\vdots\\
+\phi(\tfrac{2\pi m}{M};\tfrac{2\pi (M-2)}{N})\\
+\phi(\tfrac{2\pi m}{M};\tfrac{2\pi (M-1)}{N})
+\end{bmatrix}
+= 
+\begin{bmatrix}
+W_N^{0}&W_N^{0}&\cdots&W^{0}&W_N^{0}&\cdots&W_N^{0}&W_N^{0}\\
+W_N^{0}&W_N^{-1}&\cdots&W_N^{-K}&W_N^{K}&\cdots&W_N^2&W_N^1\\
+\vdots&\vdots&&\vdots&\vdots&&\vdots&\vdots\\
+W_N^0&W_N^{-1(N-2)}&\cdots&W_N^{-K(N-2)}&W_N^{K(N-2)}&\cdots&W_N^{2(N-2)}&W_N^{1(N-2)}\\
+W_N^0&W_N^{-1(N-1)}&\cdots&W_N^{-K(N-1)}&W_N^{K(N-1)}&\cdots&W_N^{2(N-1)}&W_N^{1(N-1)}\\
+\end{bmatrix}E_{K,\epsilon}C_{K,\epsilon}
+\begin{bmatrix}
+W_M^0\\
+W_M^1\\
+\vdots\\
+W_M^K\\
+W_M^{-K}\\
+\vdots\\
+W_M^{-2}\\
+W_M^{-1}
+\end{bmatrix}
+\end{equation}
+where  $W_N=e^{\frac{i2\pi}{N}}$, $W_M=e^{\frac{i2\pi}{M}}$ and 
+\begin{eqnarray}
+	E_{K,\epsilon} &=& 
+	\mydiag\{\epsilon^0,\epsilon^2,\dots,\epsilon^K,\epsilon^{K},\dots,\epsilon^4,\epsilon^2\}\\
+	C_{K,\epsilon} &=& \mydiag\{c_{0,\epsilon},c_{1,\epsilon},\dots,c_{K,\epsilon},c_{K,\epsilon},\dots,c_{2,\epsilon},c_{1,\epsilon}\}.
+\end{eqnarray}
+
+The collocation matrix $A_{m,n}=\phi(x_m;x_n)$ for $m=1,\dots,M$, $n=1,\dots,N$ becomes
+\begin{eqnarray}
+A
+&=& 
+\begin{bmatrix}
+W_M^0&W_M^0&\cdots&W_M^0&W_M^0\\
+W_M^0&W_M^{-1}&\cdots&W_M^{-(M-2)}&W_M^{-(M-1)}\\
+\vdots&\vdots&&\vdots&\vdots\\
+W_M^0&W_M^{-K}&\cdots&W_M^{-K(M-2)}&W_M^{-K(M-1)}\\
+W_M^0&W_M^{K}&\cdots&W_M^{K(M-2)}&W_M^{K(M-1)}\\
+\vdots&\vdots&&\vdots&\vdots\\
+W_M^0&W_M^{2}&\cdots&W_M^{2(M-2)}&W_M^{2(M-1)}\\
+W_M^0&W_M^{1}&\cdots&W_M^{(M-2)}&W_M^{M-1}\\
+\end{bmatrix}^*\times\\
+&&\quad
+ E_{K,\epsilon}\times C_{K,\epsilon}\times \begin{bmatrix}
+W_N^{0}&W_N^{0}&\cdots&W_N^{0}&W_N^{0}\\
+W_N^{0}&W_N^{-1}&\cdots&W_N^{-1(N-2)}&W_N^{-1(N-1)}\\
+\vdots&\vdots&&\vdots&\vdots\\
+W_N^{0}&W_N^{-K}&\cdots&W_N^{-K(N-2)}&W_N^{-K(N-1)}\\
+W_N^{0}&W_N^{K}&\cdots&W_N^{K(N-2)}&W_N^{K(N-1)}\\
+\vdots&\vdots&&\vdots&\vdots\\
+W_N^{0}&W_N^{2}&\cdots&W_N^{2(N-2)}&W_N^{2(N-1)}\\
+W_N^{0}&W_N^{1}&\cdots&W_N^{1(N-2)}&W_N^{1(N-1)}\\
+\end{bmatrix}.
+\end{eqnarray}
+Note the adjoint applied at the first matrix. The first and last matrix are very similar to the DFT matrix of size $N\times N$
+\begin{equation}
+\begin{matrix}
+F_N = \begin{bmatrix}
+1&1&1&1&\cdots&1\\
+1&W_N^{-1}&W_N^{-2}&W_N^{-3}&\cdots&W_N^{-(N-1)}\\
+1&W_N^{-2}&W_N^{-4}&W_N^{-6}&\cdots&W_N^{-2(N-1)}\\
+1&W_N^{-3}&W_N^{-6}&W_N^{-9}&\cdots&W_N^{-3(N-1)}\\
+\vdots&\vdots&\vdots&\vdots&\ddots&\vdots\\
+1&W_N^{-(N-1)}&W_N^{-2(N-1)}&W_N^{-3(N-1)}&\cdots&W_N^{-(N-1)(N-1)}
+\end{bmatrix}
+\end{matrix}	
+\end{equation}
+
+
+
+
+
+\bibliographystyle{siam}
+\bibliography{/Users/vincentcp/unief/LaTeX/library}
+\end{document}

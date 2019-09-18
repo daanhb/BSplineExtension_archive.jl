@@ -15,7 +15,8 @@ using InfiniteVectors: Integers, downsample, subvector, CompactInfiniteVector, P
 
 export CompactPeriodicEquispacedTranslatesDual
 """
-    struct CompactPeriodicEquispacedTranslatesDual{T,K} <: PeriodicEquispacedTranslates{T,K}
+    struct CompactPeriodicEquispacedTranslatesDual{T,K,DICT<:PeriodicEquispacedTranslates{T,K,PERIODIZATION}}
+            <: PeriodicEquispacedTranslates{T,K,PERIODIZATION}
 
 Compact, discrete, periodic dual --- with respect to a `DiracCombMeasure` ---
 to the a dictionary consisting of equispaced
@@ -41,7 +42,7 @@ julia> A = evaluation_operator(B, PeriodicEquispacedGrid(10, BasisFunctions.supp
 Multiplication by BasisFunctions.VerticalBandedMatrix{Float64}
 ```
 """
-struct CompactPeriodicEquispacedTranslatesDual{T,K,DICT<:PeriodicEquispacedTranslates{T,K}} <: PeriodicEquispacedTranslates{T,K}
+struct CompactPeriodicEquispacedTranslatesDual{T,S,PERIODIZATION,DICT<:PeriodicEquispacedTranslates{T,S,PERIODIZATION}} <: PeriodicEquispacedTranslates{T,S,PERIODIZATION}
     dict   ::   DICT
     m      ::   Int
 end
@@ -65,7 +66,8 @@ grid_evaluation_operator(dict::CompactPeriodicEquispacedTranslatesDual, dgs::Gri
 eval_kernel(dict::CompactPeriodicEquispacedTranslatesDual, x) =
     error("`CompactPeriodicEquispacedTranslatesDual` can only be evaluated in `PeriodicEquispacedGrid`")
 
-function grid_evaluation_operator(dict::CompactPeriodicEquispacedTranslatesDual{T}, gb::GridBasis, grid::PeriodicEquispacedGrid; threshold=regularization_threshold(T), options...) where {T}
+function grid_evaluation_operator(dict::CompactPeriodicEquispacedTranslatesDual{T}, gb::GridBasis, grid::PeriodicEquispacedGrid;
+        threshold=regularization_threshold(T), options...) where {T}
     @assert support(dict) ≈ support(grid)
     m_dict = dict.m
     m_frac = m_dict*length(dict) / length(grid)

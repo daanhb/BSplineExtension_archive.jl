@@ -3,7 +3,7 @@ Pkg.develop(PackageSpec(path=splitdir(@__DIR__)[1]))
 using Documenter, BSplineExtension, BSplineExtension.BSplinePlatforms, BSplineExtension.BSplineExtensionSolvers
 
 
-# include("render_figs.jl")
+include("render_figs.jl")
 
 
 const render_pdf = "pdf" in ARGS
