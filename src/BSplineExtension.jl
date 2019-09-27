@@ -25,5 +25,5 @@ using CompactTranslatesDict: PeriodicEquispacedTranslates
 FrameFun.Platforms.platform(dict::PeriodicEquispacedTranslates) =
     CDPETPlatform(dict)
 
-
+include("azsparse.jl")
 end

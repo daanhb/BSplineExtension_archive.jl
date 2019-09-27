@@ -1,8 +1,11 @@
 export nonzero_cols
-nonzero_cols(dict::Dictionary, gamma::AbstractGrid, domain::Domain) =
-    coefficient_indices_of_overlapping_elements(dict, gamma[findall(boundary_mask(gamma, domain, true))])
+nonzero_cols(dict::ExtensionFrame, measure::DiscreteSubMeasure) =
+    nonzero_cols(basis(dict), grid(supermeasure(measure)), support(dict))
 
-nonzero_cols(dict::TensorProductDict{N}, gamma::AbstractGrid, domain::Domain) where N =
+nonzero_cols(dict::Dictionary, gamma::ProductGrid{TUPLE,DT,N}, domain::Domain) where {TUPLE,DT,N}  =
+    coefficient_indices_of_overlapping_elements(dict, gamma[findall(boundary_mask(gamma, domain, ntuple(k->true,Val(N))))])
+
+nonzero_cols(dict::TensorProductDict{N}, gamma::ProductGrid{TUPLE,DT,N}, domain::Domain) where {TUPLE,DT,N} =
     coefficient_indices_of_overlapping_elements(dict, gamma[findall(boundary_mask(gamma, domain, ntuple(k->true,Val(N))))])
 
 # # TODO
@@ -25,8 +28,8 @@ end
 # nonzero_coefficients(B::Dictionary, x::Real) =
 #     tuple(nonzero_coefficients(B, x))
 
-nonzero_coefficients(dict::TensorProductDict, x) =
-    tuple(map((dicti,xi)->nonzero_coefficients(dicti,xi)[1], elements(dict), x)...)
+nonzero_coefficients(dict::TensorProductDict{N}, x) where N =
+    ntuple(k->nonzero_coefficients(elements(dict)[k],x[k])[1] ,Val(N))
 
 # Cartesian index limits of the coefficients of B that overlap with x.
 function coefficient_cartesian_index_limits_of_overlapping_elementst(B::Dictionary, x)
