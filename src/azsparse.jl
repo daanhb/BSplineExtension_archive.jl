@@ -10,7 +10,7 @@
 # write nonzero_cols if domain is a grid
 
 module AZSparse
-using ..BSplineExtensionSolvers: nonzero_cols
+using ..BSplineExtensionSolvers: nonzero_cols, nonzero_rows
 
 
 using InfiniteVectors, GridArrays, FrameFun.BasisFunctions, CardinalBSplines, CompactTranslatesDict, SparseArrays, FrameFun
@@ -23,7 +23,15 @@ using GridArrays.ModCartesianIndicesBase: ModCartesianIndices
 import FrameFun.BasisFunctions: support
 import CardinalBSplines: bsplinesignal
 
-sparsemixedgramcomplement(dict1::Dictionary, dict2::Dictionary, measure::DiscreteMeasure;options...) =
+function sparseAAZAmatrix(dict1, dict2, measure)
+    ImZA = sparsemixedgramcomplement(dict2, dict1, measure)
+    col_indices = findall(reshape(nonzero_rows(ImZA),size(dict1)))
+    RAE = sparseRAE(dict1, measure, col_indices)
+
+    RAE*ImZA[LinearIndices(size(dict1))[col_indices],:]
+end
+
+sparsemixedgramcomplement(dict1::Dictionary, dict2::Dictionary, measure::DiscreteMeasure) =
     sparsemixedgramcomplement(nonzero_cols(dict2, measure), bsplinesignal(dict1, measure),
         bsplinesignal(dict2, measure), _oversamplingfactor(dict1,measure), FrameFun.grid(measure))
 
@@ -57,9 +65,13 @@ function sparsemixedgramcomplement_nzband(indices::AbstractArray{CartesianIndex{
 
     R = Matrix{T}(undef, L, length(indices))
     zerocartesian = CartesianIndex(ntuple(k->0,Val(N)))
+
+    bb = Array(OuterProductArray(map(subvector, b)...))
+    b̃b̃ = Array(OuterProductArray(map(subvector, b̃)...))
+
     for (i,k) in enumerate(indices)
         for (j,d) in enumerate(dff)
-            R[j,i] = (d==zerocartesian ? T(1) : T(0)) - _innerproduct(b, b_support, b̃, b̃_support, m, k, d, grid)
+            R[j,i] = (d==zerocartesian ? T(1) : T(0)) - _innerproduct(bb, b̃b̃, b_support, b̃_support, m, k, d, grid)
         end
     end
     R
@@ -82,31 +94,86 @@ function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},
     nzvals = Vector{T}(undef, nnz)
     colptr = Vector{Int}(undef, n+1)
     rowvals = Vector{Int}(undef, nnz)
+
+    rowvalscol = Vector{Int}(undef, length(dff))
+    nzvalscol = Vector{T}(undef, length(dff))
+    colix = Vector{Int}(undef, length(dff))
+
     L = LinearIndices(basissize)
     # periodic = ntuple(k->true,Val(N))
     valn = 1
     colptr[1] = 1
-    for (i,k) in enumerate(indices)
+    @inbounds for (i,k) in enumerate(indices)
         nnzcol = 0
-        # ls = ModCartesianIndices(basissize, k+first(dff),k+last(dff),periodic)
-
         kdff = k .+ dff
         ls = GridArrays.ModCartesianIndicesBase.ModCartesianIndices(basissize,first(kdff),last(kdff))
-        @assert length(ls) == length(dff)
+
         for (j,l) in enumerate(ls)
             if nonzeromaskR[j,i]
-                nzvals[valn] = R[j,i]
-                rowvals[valn] = L[l]
                 nnzcol += 1
-                valn += 1
+                nzvalscol[nnzcol] = R[j,i]
+                rowvalscol[nnzcol] = L[l]
             end
         end
+        for j in nnzcol+1:length(dff)
+            rowvalscol[j] = length(L)+1
+        end
+        sortperm!(colix, rowvalscol)
+        for j in 1:nnzcol
+            nzvals[valn] = nzvalscol[colix[j]]
+            rowvals[valn] = rowvalscol[colix[j]]
+            valn += 1
+        end
+
         colptr[i+1] = colptr[i] + nnzcol
     end
     SparseMatrixCSC(m,n,colptr,rowvals,nzvals)
 end
 
+function sparseRAE(b::NTuple{N,CompactInfiniteVector},
+    grid::MaskedGrid, indices::AbstractVector{CartesianIndex{N}},
+    dictsize::NTuple{N,Int}) where N
+    gridsize = size(supergrid(grid))
 
+    B = Array(OuterProductArray(map(subvector, b)...))[:]
+    b_support = support(b)
+    b_supportlength = length(b_support)
+
+    m = div.(gridsize,dictsize)
+    L = LinearIndices(gridsize)
+
+    nnz = b_supportlength*length(indices)
+
+    colptr = collect(1:b_supportlength:nnz+1)
+    nzvals = Vector{eltype(B)}(undef, nnz)
+    rowvals = Vector{Int}(undef, nnz)
+
+    rowvalscol = Vector{Int}(undef, b_supportlength)
+    nzvalscol = Vector{Int}(undef, b_supportlength)
+    colix = Vector{Int}(undef, b_supportlength)
+
+    for (i,k) in enumerate(indices)
+        # support of element with index k
+        bk_support = CartesianIndex(m.*(k.I.-1)) .+ b_support
+        bk_support_indices = ModCartesianIndices(gridsize, first(bk_support), last(bk_support))
+
+        for (j,l) in enumerate(bk_support_indices)
+            rowvalscol[j] = L[l]
+        end
+        sortperm!(colix, rowvalscol)
+        j = (i-1)*b_supportlength + 1
+        for (colixi) in (colix)
+            rowvals[j] = rowvalscol[colixi]
+            nzvals[j] = B[colixi]
+            j += 1
+        end
+    end
+
+    A = SparseMatrixCSC(prod(gridsize),length(indices),colptr,rowvals,nzvals)
+    A[L[subindices(grid)],:]
+end
+sparseRAE(dict::Dictionary, measure::DiscreteMeasure, indices) =
+    sparseRAE(bsplinesignal(dict, measure), grid(measure), indices, size(dict))
 
 support(vecs::NTuple{N,CompactInfiniteVector}) where N =
     CartesianIndex(map(_firstindex, vecs)):CartesianIndex(map(_lastindex, vecs))
@@ -143,8 +210,8 @@ function bsplinesignal(dict::PeriodicEquispacedTranslates{T}, grid::AbstractEqui
     CompactInfiniteVector(truncatedarray, os)
 end
 
-function _innerproduct(b::NTuple{N,CompactInfiniteVector{T}}, b_support::CartesianIndices{N},
-    b̃::NTuple{N,CompactInfiniteVector{T}}, b̃_support::CartesianIndices{N},
+function _innerproduct(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
+    b̃_support::CartesianIndices{N},
     m::NTuple{N,Int}, k::CartesianIndex{N}, d::CartesianIndex{N}, maskedgrid::MaskedGrid) where {N,T}
 
     coef_dff = d
@@ -160,9 +227,17 @@ function _innerproduct(b::NTuple{N,CompactInfiniteVector{T}}, b_support::Cartesi
     I = GridArrays.ModCartesianIndicesBase.ModCartesianIndices(size(supergrid(maskedgrid)), first(overlapping_k_support), last(overlapping_k_support))
 
     r = T(0)
-    for (i,imod) in zip(overlapping_k_support,I)
+    @inbounds for (i,imod) in zip(overlapping_k_support,I)
         if maskedgrid.mask[imod]
-            r += product(b, i - ktranslate)*product(b̃, i-ktranslate-grid_dff)
+            k = i - ktranslate
+            if k∈b_support
+                b1 = bb[(k -first(b_support)+CartesianIndex{N}(1))]
+                k = i-ktranslate-grid_dff
+                if k∈b̃_support
+                    b2 = b̃b̃[(k -first(b̃_support)+CartesianIndex{N}(1))]
+                    r += b1*b2
+                end
+            end
         end
     end
     r
@@ -181,53 +256,4 @@ function overlapping(a::CartesianIndices, b::CartesianIndices)
     end
 
 end
-
-##########################################
-# using StaticArrays, BSplineExtension, FrameFun, LinearAlgebra
-# D = .4*disk() + SVector(.5,.5)
-# Pbasis = NdCDBSplinePlatform((3,3))
-# P = ExtensionFramePlatform(Pbasis, D)
-# N = 20,20
-# dict1 = dictionary(P,N)
-# g = oversampling_grid(P,N)
-# γ = supergrid(g)
-# μ = discretemeasure(g)
-# dict2 = dualdictionary(P,N,μ)
-# L = LinearIndices(size(dict1))
-# C = CartesianIndices(size(dict1))
-#
-# G = Matrix(mixedgramoperator(dict2,dict1,μ))
-# indices = nonzero_cols(dict1, μ)
-# GG = copy(G);GG[:,L[indices]] .= 0;
-# sum(abs.(GG))≈count(sum(abs.(GG),dims=1) .≈1 )
-#
-# IG = I-G
-# IGE = IG[:,L[indices]]
-#
-# b = bsplinesignal(dict1,μ)
-# b̃ = bsplinesignal(dict2,μ)
-#
-# dff = difference_indices(b,b̃,(2,2))
-#
-# R = Matrix{Float64}(undef, length(dff), length(indices))
-#
-# M = GridArrays.ModCartesianIndicesBase.ModCartesianIndices(size(basis(dict1)),first(dff), last(dff))
-# M1 = GridArrays.ModCartesianIndicesBase.ModCartesianIndices(size(basis(dict1)),CartesianIndex(1,1),CartesianIndex(size(basis(dict1))))
-# for (i,k) in enumerate(indices)
-#     kdff = k .+ dff
-#     M = GridArrays.ModCartesianIndicesBase.ModCartesianIndices(size(basis(dict1)),first(kdff),last(kdff))
-#     for (j,l) in enumerate(M)
-#         R[j,i] = IG[L[M1[l]],L[k]]
-#     end
-# end
-# sum(abs.(R),dims=1) ≈ sum(abs.(IGE),dims=1)
-# count(sum(abs.(R),dims=2) .+ 1 .≈ 1)
-#
-# RR = sparsemixedgramcomplement_nzband(indices, Float64, b̃, support(b̃), b, support(b), (2,2), dff, g)
-# RR≈R
-# s = sparsemixedgramcomplement(dict2,dict1,μ)
-# sparse(IGE)≈s
-
-
-
 end

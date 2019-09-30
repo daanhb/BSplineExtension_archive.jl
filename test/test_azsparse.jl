@@ -72,3 +72,44 @@ using BSplineExtension.AZSparse: bsplinesignal, difference_indices, sparsemixedg
         @test IGE≈s
     end
 end
+
+using BSplineExtension.AZSparse: sparsemixedgramcomplement, sparseRAE
+using BSplineExtension.BSplineExtensionSolvers: nonzero_rows
+using SparseArrays, Test
+@testset "AZSparse: sparseRAE" begin
+    for (P,N,m) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4))
+        dict1 = dictionary(P,N)
+        g = oversampling_grid(P,N;L=m.*N)
+        γ = supergrid(g)
+        μ = discretemeasure(g)
+        dict2 = dualdictionary(P,N,μ)
+
+        s = sparsemixedgramcomplement(dict2,dict1,μ)
+        col_indices = findall(reshape(nonzero_rows(s),size(dict1)))
+        RAE =sparseRAE(dict1,μ,col_indices)
+        RAEref = sparse((E = IndexExtensionOperator(dict1, col_indices);tmp=AZ_A(P,N;L=m.*N)*E;tmp=Matrix(tmp);tmp[abs.(tmp).<1e-14].=0;tmp))
+        @test RAE≈RAEref
+    end
+end
+
+@testset "AZSparse: sparseAAZAmatrix" begin
+    for (P,N,m) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4))
+        dict1 = dictionary(P,N)
+        g = oversampling_grid(P,N;L=m.*N)
+        γ = supergrid(g)
+        μ = discretemeasure(g)
+        dict2 = dualdictionary(P,N,μ)
+
+        AAZA = sparseAAZAmatrix(dict1,dict2,μ)
+        ImZA = sparsemixedgramcomplement(dict2,dict1,μ)
+
+        A = Matrix(AZ_A(P,N;L=m.*N))
+        Zt = Matrix(AZ_Zt(P,N;L=m.*N))
+        indices = LinearIndices(size(dict1))[nonzero_cols(dict1,μ)]
+        @test (LinearAlgebra.I-Zt*A)[:,indices] ≈ ImZA
+        AAZAref = A-A*Zt*A
+        @test (AAZAref)[:,indices] ≈ AAZA
+        (AAZAref)[:,indices].=0
+        @test norm(AAZAref,1) <1e-9
+    end
+end
