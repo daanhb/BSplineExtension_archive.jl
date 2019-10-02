@@ -25,7 +25,7 @@ P4 = ExtensionFramePlatform(Pbasis, D)
 N4 = 20,20,10
 m4 = (2,2,2)
 
-using BSplineExtension.AZSparse: bsplinesignal, difference_indices, sparsemixedgramcomplement_nzband, sparsemixedgramcomplement
+using BSplineExtension.AZSparse: compactinfinitevector, difference_indices, sparsemixedgramcomplement_nzband, sparsemixedgramcomplement
 @testset "AZSparse: sparsemixedgramcomplement_nzband, sparsemixedgramcomplement" begin
     for (P,N,m) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4))
         dict1 = dictionary(P,N)
@@ -44,8 +44,8 @@ using BSplineExtension.AZSparse: bsplinesignal, difference_indices, sparsemixedg
         IG = I-G
         IGE = IG[:,L[indices]]
 
-        b = bsplinesignal(dict1,μ)
-        b̃ = bsplinesignal(dict2,μ)
+        b = compactinfinitevector(dict1,g)
+        b̃ = compactinfinitevector(dict2,g)
 
         dff = difference_indices(b,b̃,m)
 
@@ -86,12 +86,13 @@ using SparseArrays, Test
 
         s = sparsemixedgramcomplement(dict2,dict1,μ)
         col_indices = findall(reshape(nonzero_rows(s),size(dict1)))
-        RAE =sparseRAE(dict1,μ,col_indices)
+        RAE =sparseRAE(dict1,g,col_indices)
         RAEref = sparse((E = IndexExtensionOperator(dict1, col_indices);tmp=AZ_A(P,N;L=m.*N)*E;tmp=Matrix(tmp);tmp[abs.(tmp).<1e-14].=0;tmp))
         @test RAE≈RAEref
     end
 end
 
+using BSplineExtension.AZSparse: sparseAAZAmatrix
 @testset "AZSparse: sparseAAZAmatrix" begin
     for (P,N,m) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4))
         dict1 = dictionary(P,N)
@@ -100,7 +101,7 @@ end
         μ = discretemeasure(g)
         dict2 = dualdictionary(P,N,μ)
 
-        AAZA = sparseAAZAmatrix(dict1,dict2,μ)
+        AAZA = sparseAAZAmatrix(dict1,dict2,g)
         ImZA = sparsemixedgramcomplement(dict2,dict1,μ)
 
         A = Matrix(AZ_A(P,N;L=m.*N))

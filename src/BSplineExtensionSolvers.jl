@@ -92,7 +92,7 @@ struct BSplineExtensionSolver{T} <: VectorizingSolverOperator{T}
     function BSplineExtensionSolver(M::DictionaryOperator{T};
             crop=true, crop_tol=0, directsolver=:qr, verbose=false, lazy=false, sparse=false, options...) where T
 
-        _nonzero_cols = nonzero_cols(basis(src(M)), supergrid(grid(dest(M))), support(src(M)))
+        _nonzero_cols = nonzero_cols(src(M), grid(dest(M)))
         dict_resop = IndexRestrictionOperator(src(M), src(M)[_nonzero_cols], _nonzero_cols)
 
         verbose && println("BSplineExtensionSolver: Restrict columns (coefficients) from $(size(src(M))) to $(length(_nonzero_cols))")
@@ -160,7 +160,7 @@ end
 
 export sparseQR_solver
 sparseQR_solver(op::DictionaryOperator; options...) =
-    GenericSolverOperator(op, sparseqr_factorization(op))
+    GenericSolverOperator(op, sparseqr_factorization(op); options...)
 
-sparseqr_factorization(op::DictionaryOperator) = qr(sparse(op).A)
+sparseqr_factorization(op::DictionaryOperator; threshold=default_threshold(op), options...) = qr(sparse(op).A;tol=threshold)
 end

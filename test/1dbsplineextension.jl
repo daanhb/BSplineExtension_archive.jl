@@ -15,20 +15,20 @@ using BSplineExtension, Test
         colsizes[i,j,k,l], rowsizes[i,j,k,l]  = truncated_size(BSplineExtensionSolver(M; crop_tol=crop_tol))
     end
 
-    @test all(rowsizes[:,1,:,:] .== 4)
+    @test all(rowsizes[:,1,:,:] .== 2)
     @test all(rowsizes[:,2,:,:] .== 6)
-    @test all(rowsizes[:,3,:,:] .== 8)
+    @test all(rowsizes[:,3,:,:] .== 6)
     @test all(rowsizes[:,4,:,:] .== 10)
 
     # Test CDBSplinePlatform
-    @test all(19 .<= colsizes[3,1,:,1] .<= 27)
+    @test all(15 .<= colsizes[3,1,:,1] .<= 20)
     @test all(8 .<= colsizes[3,1,:,2] .<= 8)
     @test all(28 .<= colsizes[3,2,:,1] .<= 36)
     @test all(20 .<= colsizes[3,2,:,2] .<= 20)
     @test all(36 .<= colsizes[3,4,:,2] .<= 36)
     @test all(62 .<= colsizes[3,4,:,1][2:end] .<= 64)
 
-    @test all(180 .<= colsizes[2,1,:,1][end-1:end] .<= 180)
+    @test all(176 .<= colsizes[2,1,:,1][end-1:end] .<= 176)
     @test all(138 .<= colsizes[2,1,:,2][end-1:end] .<= 138)
     @test all(316 .<= colsizes[2,2,:,1][end-1:end] .<= 316)
     @test all(222 .<= colsizes[2,2,:,2][end-1:end] .<= 224)

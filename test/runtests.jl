@@ -32,6 +32,10 @@ end
     # include("Ndbsplineextension.jl")
 end
 
+@testset "AZ sparse" begin
+    include("test_azsparse.jl")
+end
+
 @testset "PGFPlotsX" begin
     include("test_plots.jl")
 end
