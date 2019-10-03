@@ -55,7 +55,10 @@ function sparsemixedgramcomplement_nzband(indices::AbstractArray{CartesianIndex{
 
     for (i,k) in enumerate(indices)
         for (j,d) in enumerate(dff)
-            R[j,i] = (d==zerocartesian ? T(1) : T(0)) - _innerproduct(bb, b̃b̃, b_support, b̃_support, m, k, d, gridmask, gridsize)
+            R[j,i] = - _innerproduct(bb, b̃b̃, b_support, b̃_support, m, k, d, gridmask, gridsize)
+            if d==zerocartesian
+                R[j,i] += 1
+            end
         end
     end
     R
@@ -67,6 +70,8 @@ function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},
     b_support = support(b)
     b̃_support = support(b̃)
     dff = difference_indices(b,b̃,m)
+
+    b_supportlength = length(dff)
 
     R = sparsemixedgramcomplement_nzband(indices, T, b̃, b̃_support, b, b_support, m, dff, grid)
 
@@ -102,7 +107,11 @@ function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},
         for j in nnzcol+1:length(dff)
             rowvalscol[j] = length(L)+1
         end
-        sortperm!(colix, rowvalscol)
+        for j in 1:b_supportlength
+            colix[j] = j
+        end
+        sort!(colix ,1,b_supportlength, InsertionSort,Base.Perm(Base.Order.ForwardOrdering(),rowvalscol))
+        # sortperm!(colix,rowvalscol)
         for j in 1:nnzcol
             nzvals[valn] = nzvalscol[colix[j]]
             rowvals[valn] = rowvalscol[colix[j]]
@@ -128,48 +137,62 @@ function sparseRAE(b::NTuple{N,CompactInfiniteVector},
 
     nnz = b_supportlength*length(indices)
 
-    colptr = collect(1:b_supportlength:nnz+1)
+    colptr = Vector{Int}(undef, length(indices)+1)
     nzvals = Vector{eltype(B)}(undef, nnz)
     rowvals = Vector{Int}(undef, nnz)
 
     rowvalscol = Vector{Int}(undef, b_supportlength)
-    nzvalscol = Vector{Int}(undef, b_supportlength)
+    nzvalscol = Vector{eltype(B)}(undef, b_supportlength)
     colix = Vector{Int}(undef, b_supportlength)
 
+    gridmask = mask(grid)
+    newindices = cumsum(gridmask[:])
+
+    colptr[1] = 1
+    nzvalindex = 1
     for (i,k) in enumerate(indices)
         # support of element with index k
         bk_support = CartesianIndex(m.*(k.I.-1)) .+ b_support
         bk_support_indices = ModCartesianIndices(gridsize, first(bk_support), last(bk_support))
-
+        colptrcol = 0
         for (j,l) in enumerate(bk_support_indices)
-            rowvalscol[j] = L[l]
+            if gridmask[l]
+                colptrcol += 1
+                rowvalscol[colptrcol] = newindices[L[l]]
+                nzvalscol[colptrcol] = B[j]
+            end
         end
-        sortperm!(colix, rowvalscol)
-        j = (i-1)*b_supportlength + 1
-        for (colixi) in (colix)
-            rowvals[j] = rowvalscol[colixi]
-            nzvals[j] = B[colixi]
-            j += 1
+        for j in colptrcol+1:b_supportlength
+            rowvalscol[j] = length(L)+1
         end
+
+        for j in 1:b_supportlength
+            colix[j] = j
+        end
+        sort!(colix ,1,b_supportlength, InsertionSort,Base.Perm(Base.Order.ForwardOrdering(),rowvalscol))
+        # sortperm!(colix, rowvalscol)
+        for j in 1:colptrcol
+            rowvals[nzvalindex] = rowvalscol[colix[j]]
+            nzvals[nzvalindex] = nzvalscol[colix[j]]
+            nzvalindex += 1
+        end
+        colptr[i+1] = colptr[i] + colptrcol
     end
 
-    A = SparseMatrixCSC(prod(gridsize),length(indices),colptr,rowvals,nzvals)
-    A[L[subindices(grid)],:]
+    SparseMatrixCSC(length(grid),length(indices),colptr,resize!(rowvals,nzvalindex-1),resize!(nzvals,nzvalindex-1))
 end
+
+
+
 sparseRAE(dict::Dictionary, grid::AbstractGrid, indices) =
     sparseRAE(compactinfinitevector(dict, grid), grid, indices, size(dict))
 
-
-
-function _innerproduct(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
+@inline function _innerproduct(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
     b̃_support::CartesianIndices{N},
-    m::NTuple{N,Int}, k::CartesianIndex{N}, d::CartesianIndex{N}, gridmask::BitArray{N}, gridsize::NTuple{N,Int}) where {N,T}
+    m::NTuple{N,Int}, k::CartesianIndex{N}, coef_dff::CartesianIndex{N}, gridmask::BitArray{N}, gridsize::NTuple{N,Int}) where {N,T}
 
-    coef_dff = d
     grid_dff = CartesianIndex(m .* coef_dff.I)
-    b̃dff_support = b̃_support .+ grid_dff
-    overlapping_support = overlapping(b̃dff_support,b_support)
-    @assert length(overlapping_support) > 0
+    overlapping_support = overlapping(first(b̃_support) + grid_dff, last(b̃_support) + grid_dff,first(b_support),last(b_support))
 
     ktranslate = CartesianIndex((k.I .-1 ) .* m)
 
@@ -197,7 +220,10 @@ end
 function overlapping(a::CartesianIndices, b::CartesianIndices)
     l1,r1 = first(a), last(a)
     l2,r2 = first(b), last(b)
+    overlapping(l1,r1,l2,r2)
+end
 
+function overlapping(l1,r1,l2,r2)
     if l1 <= l2 <= r1
         return l2:r1
     elseif l2 <= l1 <= r2
