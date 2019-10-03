@@ -119,3 +119,43 @@ P2 = @pgf Axis({xlabel="nnz(A)",legend_pos="north west",legend_cell_align="left"
 imgpath = joinpath(splitdir(@__FILE__())[1], "man", "figs")
 DocumentPGFPlots.savefigs(joinpath(imgpath,"sparseAZFirstStepTimings-1"), P1)
 DocumentPGFPlots.savefigs(joinpath(imgpath,"memorycheck-1"), P2)
+
+ns = 10:10:130
+timings_stepA2 = [0.297345, 1.23283, 2.81814, 5.23156, 8.35752, 12.3173, 16.8254, 21.6791, 27.5218, 34.6258, 42.4427, 56.4686, 62.2612]
+timings_stepA1 = [0.00426468, 0.0222564, 0.120515, 0.152339, 0.124117, 0.181934, 0.292225, 0.333687, 0.430269, 0.586627, 0.686298, 1.38254, 1.29379]
+timings_stepA1A2 = [0.00636455, 0.0695351, 0.205021, 0.215575, 0.369146, 0.601372, 0.77578, 1.0002, 1.25993, 1.58063, 1.89074, 2.50569, 3.26827]
+timings_stepQR = [0.223794, 2.84654, 6.97461, 15.6719, 38.9767, 65.1003, 94.6484, 141.407, 292.437, 292.88, 744.798, 1908.09, 1927.22]
+nzeroels = [0, 288, 3408, 4896, 9648, 13920, 17160, 24624, 31176, 41640, 48320, 57768, 65496]
+nnzels = [242822, 1197634, 2798866, 5418074, 8798074, 12436402, 17424026, 22703930, 28742482, 35870426, 43857198, 51992386, 61358606]
+sQ = [15360064, 265797880, 707771392, 1504699272, 3238711440, 4945325328, 7156949016, 10436365720, 16910701608, 18861740016, 27414682888, 37966239136, 37970313232]
+sR = [2558048, 33734472, 92452680, 198994296, 421433080, 637234776, 926279816, 1332721896, 2156746712, 2388924200, 3499053208, 4723625240, 4732829096]
+sT = [4512, 86440, 309840, 672696, 1100560, 1646512, 2395736, 3149208, 4040024, 5179168, 6476392, 7422752, 8871472]
+sPcol = [4704, 19128, 42552, 76728, 120696, 172344, 235704, 308280, 389304, 482136, 583608, 692664, 815448]
+sProw = [16912, 136656, 462256, 1096560, 2142128, 3702288, 5882288, 8783376, 12499760, 17149072, 22832208, 29640784, 37688112]
+
+P1 = @pgf Axis({xlabel="nnz(A)",legend_pos="north west",legend_cell_align="left",xmode="log",ymode="log"},
+    Plot({only_marks,color="blue"},Table(nnzels,timings_stepA2)),
+    LegendEntry(L"I-AZ^*"),
+    Plot({only_marks,color="red"},Table(nnzels,timings_stepA1)),
+    LegendEntry(L"A"),
+    Plot({only_marks,color="green"},Table(nnzels,timings_stepA1A2)),
+    LegendEntry(L"A-AZ^*A"),
+    Plot({only_marks,color="black"},Table(nnzels,timings_stepQR)),
+    LegendEntry(L"QR"),
+    Plot({style="black,dashed"},Table(nnzels,1e-6nnzels)),
+    LegendEntry(L"\mathcal O(\textrm{nnz}(A))"),
+    )
+P2 = @pgf Axis({xlabel="nnz(A)",legend_pos="north west",legend_cell_align="left",xmode="log",ymode="log"},
+    Plot({only_marks,color="blue"},Table(nnzels,sQ)),
+    LegendEntry("factors (Q)"),
+    Plot({only_marks,color="red"},Table(nnzels,sT)),
+    LegendEntry(L"\tau"),
+    Plot({only_marks,color="green"},Table(nnzels,sR)),
+    LegendEntry(L"R"),
+    Plot({only_marks,color="black"},Table(nnzels,sPcol)),
+    LegendEntry("cpiv"),
+    Plot({only_marks,color="brown"},Table(nnzels,sProw)),
+    LegendEntry("rpivinv"),
+    Plot({style="black,dashed"},Table(nnzels,nnzels)),
+    LegendEntry(L"\mathcal O(\textrm{nnz}(A))"),
+)

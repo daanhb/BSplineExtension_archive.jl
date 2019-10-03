@@ -23,6 +23,7 @@ FrameFun.Platforms.platform(dict::PeriodicEquispacedTranslates) =
     CDPETPlatform(dict)
 
 include("AZSparse/AZSparse.jl")
+@reexport using .AZSparse
 
 include("BrainScan/BrainScan.jl")
 @reexport using .BrainScan

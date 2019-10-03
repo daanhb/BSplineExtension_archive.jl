@@ -160,7 +160,7 @@ end
 
 export sparseQR_solver
 sparseQR_solver(op::DictionaryOperator; options...) =
-    GenericSolverOperator(op, sparseqr_factorization(op); options...)
+    GenericSolverOperator(op, sparseqr_factorization(op; options...))
 
 sparseqr_factorization(op::DictionaryOperator; threshold=default_threshold(op), options...) = qr(sparse(op).A;tol=threshold)
 end

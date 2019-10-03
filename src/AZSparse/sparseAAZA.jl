@@ -6,17 +6,17 @@ using FrameFun.BasisFunctions: DiscreteMeasure, support
 using GridArrays.ModCartesianIndicesBase: ModCartesianIndices
 using ..CompactInfiniteVectors
 
-function sparseAAZAmatrix(dict1::Dictionary, dict2::Dictionary, grid::AbstractGrid)
-    ImZA = sparsemixedgramcomplement(dict2, dict1, discretemeasure(grid))
+function sparseAAZAmatrix(dict1::Dictionary, dict2::Dictionary, grid::AbstractGrid; opts...)
+    ImZA = sparsemixedgramcomplement(dict2, dict1, discretemeasure(grid); opts...)
     col_indices = findall(reshape(nonzero_rows(ImZA),size(dict1)))
-    RAE = sparseRAE(dict1, grid, col_indices)
+    RAE = sparseRAE(dict1, grid, col_indices; opts...)
 
     RAE*ImZA[LinearIndices(size(dict1))[col_indices],:]
 end
 
-sparsemixedgramcomplement(dict1::Dictionary, dict2::Dictionary, measure::DiscreteMeasure) =
+sparsemixedgramcomplement(dict1::Dictionary, dict2::Dictionary, measure::DiscreteMeasure; opts...) =
     sparsemixedgramcomplement(nonzero_cols(dict2, measure), compactinfinitevector(dict1, grid(measure)),
-        compactinfinitevector(dict2, grid(measure)), _oversamplingfactor(dict1,grid(measure)), grid(measure))
+        compactinfinitevector(dict2, grid(measure)), _oversamplingfactor(dict1,grid(measure)), grid(measure);opts...)
 
 _oversamplingfactor(dict::ExtensionFrame, grid::AbstractGrid) =
     _oversamplingfactor(basis(dict), supergrid(grid))
@@ -35,8 +35,10 @@ function difference_indices(b::NTuple{N,CompactInfiniteVector}, b̃::NTuple{N,Co
     dff1 = first(b_support)-last(b̃_support)
     dff2 = last(b_support)-first(b̃_support)
 
-    CartesianIndex(map((x,y)->trunc(Int,x/y), dff1.I, m)):CartesianIndex(map((x,y)->trunc(Int,x/y), dff2.I,m))
+    myfun = (a,b) -> sign(a)*fld(abs(a), b)
+    CartesianIndex(map(myfun, dff1.I, m)):CartesianIndex(map(myfun, dff2.I,m))
 end
+
 
 function sparsemixedgramcomplement_nzband(indices::AbstractArray{CartesianIndex{N}}, T,
         b̃::NTuple{N,CompactInfiniteVector}, b̃_support::CartesianIndices{N},
@@ -65,7 +67,7 @@ function sparsemixedgramcomplement_nzband(indices::AbstractArray{CartesianIndex{
 end
 
 function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},
-        b̃::NTuple{N,CompactInfiniteVector}, b::NTuple{N,CompactInfiniteVector}, m::NTuple{N,Int}, grid::AbstractGrid) where N
+        b̃::NTuple{N,CompactInfiniteVector}, b::NTuple{N,CompactInfiniteVector}, m::NTuple{N,Int}, grid::AbstractGrid;atol=1e-14) where N
     T = promote_type(map(eltype,b)..., map(eltype, b̃)...)
     b_support = support(b)
     b̃_support = support(b̃)
@@ -75,7 +77,7 @@ function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},
 
     R = sparsemixedgramcomplement_nzband(indices, T, b̃, b̃_support, b, b_support, m, dff, grid)
 
-    nonzeromaskR = .!(abs.(R).+1 .≈ 1)
+    nonzeromaskR = abs.(R) .> atol
     nnz = count(nonzeromaskR)
     basissize = div.(size(supergrid(grid)),m)
     n = length(indices)
@@ -125,10 +127,11 @@ end
 
 function sparseRAE(b::NTuple{N,CompactInfiniteVector},
     grid::AbstractGrid, indices::AbstractVector{CartesianIndex{N}},
-    dictsize::NTuple{N,Int}) where N
+    dictsize::NTuple{N,Int}; atol=1e-14) where N
     gridsize = size(supergrid(grid))
 
     B = Array(OuterProductArray(map(subvector, b)...))[:]
+    B[abs.(B).<atol].=0
     b_support = support(b)
     b_supportlength = length(b_support)
 
@@ -156,7 +159,7 @@ function sparseRAE(b::NTuple{N,CompactInfiniteVector},
         bk_support_indices = ModCartesianIndices(gridsize, first(bk_support), last(bk_support))
         colptrcol = 0
         for (j,l) in enumerate(bk_support_indices)
-            if gridmask[l]
+            if gridmask[l] && B[j] != 0
                 colptrcol += 1
                 rowvalscol[colptrcol] = newindices[L[l]]
                 nzvalscol[colptrcol] = B[j]
@@ -184,8 +187,8 @@ end
 
 
 
-sparseRAE(dict::Dictionary, grid::AbstractGrid, indices) =
-    sparseRAE(compactinfinitevector(dict, grid), grid, indices, size(dict))
+sparseRAE(dict::Dictionary, grid::AbstractGrid, indices;opts...) =
+    sparseRAE(compactinfinitevector(dict, grid), grid, indices, size(dict);opts...)
 
 @inline function _innerproduct(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
     b̃_support::CartesianIndices{N},
