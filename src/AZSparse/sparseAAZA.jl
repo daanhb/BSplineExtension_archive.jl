@@ -7,11 +7,42 @@ using GridArrays.ModCartesianIndicesBase: ModCartesianIndices
 using ..CompactInfiniteVectors
 
 function sparseAAZAmatrix(dict1::Dictionary, dict2::Dictionary, grid::AbstractGrid; opts...)
-    ImZA = sparsemixedgramcomplement(dict2, dict1, discretemeasure(grid); opts...)
-    col_indices = findall(reshape(nonzero_rows(ImZA),size(dict1)))
-    RAE = sparseRAE(dict1, grid, col_indices; opts...)
+    ix1 = nonzero_cols(dict1, grid)
+    A = sparseRAE(dict1, grid, ix1; opts...)
+    ix2 = nonzero_cols(dict2, grid)
+    Z = sparseRAE(dict2, grid, ix2; opts...)
+    ImZA = sparseidentity(ix1,ix2)-Z'A
+    RAE = sparseRAE(dict1, grid, ix2; opts...)
+    RAE*ImZA
+end
 
-    RAE*ImZA[LinearIndices(size(dict1))[col_indices],:]
+function sparseidentity(ix1::Vector{CartesianIndex{N}},ix2::Vector{CartesianIndex{N}}) where N
+    R = Vector{Int}(undef, min(length(ix1),length(ix2)))
+    colptr = Vector{Int}(undef, length(ix1)+1)
+    colptr[1] = 1
+    ix1i = 1
+    ix2i = 1
+    ix1e = first(ix1)
+    ix2e = first(ix2)
+    Ri = 0
+    for (ix1i, ix1e) in enumerate(ix1)
+        while ix2e < ix1e
+            ix2i += 1
+            if ix2i > length(ix2)
+                break
+            end
+            ix2e=ix2[ix2i]
+        end
+        if ix1e == ix2e
+            colptr[ix1i+1] = colptr[ix1i]+1
+            Ri += 1
+            R[Ri] = ix2i
+        else
+            colptr[ix1i+1] = colptr[ix1i]
+        end
+    end
+    resize!(R,Ri)
+    SparseMatrixCSC(length(ix2), length(ix1), colptr, R, ones(Int, Ri))
 end
 
 sparsemixedgramcomplement(dict1::Dictionary, dict2::Dictionary, measure::DiscreteMeasure; opts...) =
@@ -64,6 +95,175 @@ function sparsemixedgramcomplement_nzband(indices::AbstractArray{CartesianIndex{
         end
     end
     R
+end
+
+
+
+function sparsemixedgramcomplement_nzband2(indices::AbstractArray{CartesianIndex{N}}, T,
+        b̃::NTuple{N,CompactInfiniteVector}, b̃_support::CartesianIndices{N},
+        b::NTuple{N,CompactInfiniteVector}, b_support::CartesianIndices{N},
+        m::NTuple{N,Int}, dff::CartesianIndices{N}, grid::AbstractGrid) where N
+    L = length(dff)
+
+    R = Matrix{T}(undef, L, length(indices))
+    zerocartesian = CartesianIndex(ntuple(k->0,Val(N)))
+
+    bb = Array(OuterProductArray(map(subvector, b)...))
+    b̃b̃ = Array(OuterProductArray(map(subvector, b̃)...))
+
+    gridmask = mask(grid)
+    gridsize = size(supergrid(grid))
+
+    L1 = length(bb)
+    nzvals1 = Vector{T}(undef, L1)
+    colptr1 = Vector{Int}(undef, 2)
+    rowvals1 = Vector{Int}(undef, L1)
+    v1 = SparseMatrixCSC(length(gridmask), 1, colptr1, rowvals1, nzvals1)
+
+    gridmaskcache1 = falses(size(bb))
+    rowvalscache1 = Vector{Int}(undef,L1)
+    nzvalscache1 = Vector{T}(undef,L1)
+    indexcache1 = Vector{Int}(undef,L1)
+
+    L2 = length(b̃b̃)
+    nzvals2 = Vector{T}(undef, L2)
+    colptr2 = Vector{Int}(undef, 2)
+    rowvals2 = Vector{Int}(undef, L2)
+    v2 = SparseMatrixCSC(length(gridmask), 1, colptr2, rowvals2, nzvals2)
+
+    gridmaskcache2 = falses(size(b̃b̃))
+    rowvalscache2 = Vector{Int}(undef,L2)
+    nzvalscache2 = Vector{T}(undef,L2)
+    indexcache2 = Vector{Int}(undef,L2)
+
+
+    for (i,k) in enumerate(indices)
+        for (j,d) in enumerate(dff)
+            R[j,i] = - _sparse_innerproduct!(bb, b̃b̃, b_support, b̃_support, m, k, d, gridmask, gridsize,
+                v1, gridmaskcache1, rowvalscache1, nzvalscache1,indexcache1,
+                v2, gridmaskcache2, rowvalscache2, nzvalscache2,indexcache2)
+
+            if d==zerocartesian
+                R[j,i] += 1
+            end
+        end
+    end
+    R
+end
+
+
+function _sparse_innerproduct(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
+        b̃_support::CartesianIndices{N}, m::NTuple{N,Int}, k::CartesianIndex{N},
+        d::CartesianIndex{N}, gridmask::BitArray{N}, gridsize::NTuple{N,Int}) where {T,N}
+    L1 = length(bb)
+    nzvals1 = Vector{T}(undef, L1)
+    colptr1 = Vector{Int}(undef, 2)
+    rowvals1 = Vector{Int}(undef, L1)
+    v1 = SparseMatrixCSC(length(gridmask), 1, colptr1, rowvals1, nzvals1)
+
+    gridmaskcache1 = falses(size(bb))
+    rowvalscache1 = Vector{Int}(undef,L1)
+    nzvalscache1 = Vector{T}(undef,L1)
+    indexcache1 = Vector{Int}(undef,L1)
+
+    L2 = length(b̃b̃)
+    nzvals2 = Vector{T}(undef, L2)
+    colptr2 = Vector{Int}(undef, 2)
+    rowvals2 = Vector{Int}(undef, L2)
+    v2 = SparseMatrixCSC(length(gridmask), 1, colptr2, rowvals2, nzvals2)
+
+    gridmaskcache2 = falses(size(b̃b̃))
+    rowvalscache2 = Vector{Int}(undef,L2)
+    nzvalscache2 = Vector{T}(undef,L2)
+    indexcache2 = Vector{Int}(undef,L2)
+
+    _sparse_innerproduct!(bb, b̃b̃, b_support, b̃_support, m, d, gridmask, gridsize,
+        v1, gridmaskcache1, rowvalscache1, nzvalscache1,indexcache1,
+        v2, gridmaskcache2, rowvalscache2, nzvalscache2,indexcache2)
+end
+
+function _sparse_innerproduct!(bb::Array{T,N}, b̃b̃::Array{T,N}, b_support::CartesianIndices{N},
+        b̃_support::CartesianIndices{N}, m::NTuple{N,Int}, k::CartesianIndex{N},
+        d::CartesianIndex{N}, gridmask::BitArray{N}, gridsize::NTuple{N,Int},
+        v1, gridmaskcache1::BitArray{N}, rowvalscache1, nzvalscache1, indexcache1,
+        v2, gridmaskcache2::BitArray{N}, rowvalscache2, nzvalscache2, indexcache2) where {T,N}
+
+    sparsevector!(v1, b_support .+ CartesianIndex((k.I .-1 ) .* m), gridsize, gridmask, bb, gridmaskcache1, rowvalscache1, nzvalscache1,indexcache1)
+    sparsevector!(v2, b̃_support .+ CartesianIndex(m .* (d.I .+ k.I .- 1)), gridsize, gridmask, b̃b̃, gridmaskcache2, rowvalscache2, nzvalscache2,indexcache2)
+
+    dot(v1,v2)
+end
+
+function sparsevector!(v, indices::CartesianIndices{N}, gridsize::NTuple{N,Int}, gridmask::BitArray{N}, bb::Array{T,N}, gridmaskcache::BitArray{N},
+        rowvalscache, nzvalscache, indexcache) where {T,N}
+    mod_indices = ModCartesianIndices(gridsize, first(indices), last(indices))
+    L = LinearIndices(size(gridmask))
+    cacheindices = CartesianIndices(size(mod_indices))
+
+    copyto!(gridmaskcache, cacheindices, gridmask,mod_indices)
+    v.colptr[1] = 1
+
+    nzval = 0
+    rowval = 0
+
+    for (i,j) in zip(cacheindices,mod_indices)
+        rowval += 1
+        if gridmaskcache[i]
+            nzval += 1
+            rowvalscache[nzval] = L[j]
+            nzvalscache[nzval] = bb[i]
+        end
+    end
+    v.colptr[2] = nzval + 1
+
+    for i in nzval+1:length(nzvalscache)
+        rowvalscache[i] = length(L)+1
+    end
+    sortperm!(indexcache, rowvalscache)
+    # sortperm!(view(indexcache,1:nzval), view(rowvalscache,1:nzval))
+    for i in 1:nzval
+        v.rowval[i] = rowvalscache[indexcache[i]]
+        v.nzval[i] = nzvalscache[indexcache[i]]
+    end
+    v
+end
+
+splitted(M::ModCartesianIndices{N}) where N =
+    first(M) > last(M)
+
+function Base.copyto!(dest::AbstractArray{T,N}, destindices::CartesianIndices, src::AbstractArray{T,N}, srcindices::ModCartesianIndices) where {T,N}
+    if !splitted(srcindices)
+        return copyto!(dest, destindices, src, first(srcindices):last(srcindices))
+    end
+
+    p1 = first(srcindices)
+    p2 = CartesianIndex(srcindices.size)
+    p3 = last(srcindices)
+
+    srcix = p1:p2
+
+    q1 = first(destindices)
+    q2 = q1 + CartesianIndex(size(srcix) .- 1)
+    q3 = last(destindices)
+
+    destix = q1:q2
+    copyto!(dest, destix, src, srcix)
+
+    p2 = p2 + CartesianIndex{N}(1)
+    q2 = q2 + CartesianIndex{N}(1)
+
+    for i in CartesianIndices(ntuple(k->2,Val(N)))
+        if i == CartesianIndex{N}(1)
+            nothing
+        else
+            srcix = CartesianIndex(ntuple(k->i[k] == 1 ? p1[k] : p2[k] ,Val(N))):CartesianIndex(ntuple(k->i[k] == 1 ? p2[k] : p3[k],Val(N)))
+            destix = CartesianIndex(ntuple(k->i[k] == 1 ? q1[k] : q2[k] ,Val(N))):CartesianIndex(ntuple(k->i[k] == 1 ? q2[k] : q3[k],Val(N)))
+            copyto!(dest, destix, src, srcix)
+        end
+
+    end
+
+    dest
 end
 
 function sparsemixedgramcomplement(indices::AbstractArray{CartesianIndex{N}},

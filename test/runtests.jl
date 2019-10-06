@@ -36,6 +36,10 @@ end
     include("test_azsparse.jl")
 end
 
+@testset "Brainscan" begin
+    include("test_brainscan.jl")
+end
+
 @testset "PGFPlotsX" begin
     include("test_plots.jl")
 end

@@ -30,7 +30,7 @@ platform_grid(ss::GridStyle, platform::BrainPlatform, param; options...) =
 
 
 
-SolverStyle(dict::BrainPlatform, ::OversamplingStyle) = SparseAZStyle()
+SolverStyle(dict::BrainPlatform, ::SamplingStyle) = AZSparseStyle()
 
 SamplingStyle(p::BrainPlatform) = GridStyle()
 

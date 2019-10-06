@@ -2,28 +2,39 @@ using StaticArrays, BSplineExtension, FrameFun, LinearAlgebra, SparseArrays, Bas
 
 
 D = .4*disk() + SVector(.5,.5)
-Pbasis = NdCDBSplinePlatform((1,1))
-P1 = ExtensionFramePlatform(Pbasis, D)
-N1 = 20,20
-m1 = (2,2)
+    Pbasis = NdCDBSplinePlatform((1,1))
+    P1 = ExtensionFramePlatform(Pbasis, D)
+    N1 = 20,20
+    m1 = (2,2)
+    f1 = (x,y)->exp(x*y)
 
-D = .4*disk() + SVector(.5,.5)
-Pbasis = NdCDBSplinePlatform((3,3))
-P3 = ExtensionFramePlatform(Pbasis, D)
-N3 = 20,20
-m3 = (2,2)
+    D = .4*disk() + SVector(.5,.5)
+    Pbasis = NdCDBSplinePlatform((3,3))
+    P3 = ExtensionFramePlatform(Pbasis, D)
+    N3 = 20,20
+    m3 = (2,2)
+    f3 = (x,y)->exp(x*y)
 
-D = .4*disk() + SVector(.5,.5)
-Pbasis = NdCDBSplinePlatform((2,2))
-P2 = ExtensionFramePlatform(Pbasis, D)
-N2 = 20,20
-m2 = (2,3)
+    D = .4*disk() + SVector(.5,.5)
+    Pbasis = NdCDBSplinePlatform((2,2))
+    P2 = ExtensionFramePlatform(Pbasis, D)
+    N2 = 20,20
+    m2 = (2,3)
+    f2 = (x,y)->exp(x*y)
 
-D = .4*ball() + SVector(.5,.5,.5)
-Pbasis = NdCDBSplinePlatform((2,2,2))
-P4 = ExtensionFramePlatform(Pbasis, D)
-N4 = 20,20,10
-m4 = (2,2,2)
+    D = .4*ball() + SVector(.5,.5,.5)
+    Pbasis = NdCDBSplinePlatform((2,2,2))
+    P4 = ExtensionFramePlatform(Pbasis, D)
+    N4 = 20,20,10
+    m4 = (2,2,2)
+    f4 = (x,y,z)->exp(x*y*z)
+
+    D = .4*ball() + SVector(.5,.5,.5)
+    Pbasis = NdCDBSplinePlatform((3,3,3))
+    P5 = ExtensionFramePlatform(Pbasis, D)
+    N5 = 20,20,30
+    m5 = (2,2,2)
+    f5 = (x,y,z)->exp(x*y*z)
 
 using BSplineExtension.AZSparse: compactinfinitevector, difference_indices, sparsemixedgramcomplement_nzband, sparsemixedgramcomplement
 @testset "AZSparse: sparsemixedgramcomplement_nzband, sparsemixedgramcomplement" begin
@@ -92,7 +103,7 @@ using SparseArrays, Test
     end
 end
 
-using BSplineExtension.AZSparse: sparseAAZAmatrix
+using BSplineExtension.AZSparse: sparseAAZAmatrix, sparseidentity
 @testset "AZSparse: sparseAAZAmatrix" begin
     for (P,N,m) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4))
         dict1 = dictionary(P,N)
@@ -100,17 +111,38 @@ using BSplineExtension.AZSparse: sparseAAZAmatrix
         γ = supergrid(g)
         μ = discretemeasure(g)
         dict2 = dualdictionary(P,N,μ)
+        L = LinearIndices(size(dict1))
 
         AAZA = sparseAAZAmatrix(dict1,dict2,g)
         ImZA = sparsemixedgramcomplement(dict2,dict1,μ)
 
-        A = Matrix(AZ_A(P,N;L=m.*N))
-        Zt = Matrix(AZ_Zt(P,N;L=m.*N))
+        A_ref = Matrix(AZ_A(P,N;L=m.*N))
+        Z_ref = Matrix(AZ_Z(P,N;L=m.*N))
+        ix1 = nonzero_cols(dict1, g)
+        A = sparseRAE(dict1, g, ix1)
+        ix2 = nonzero_cols(dict2, g)
+        Z = sparseRAE(dict2, g, ix2)
+
+        @test Z'A ≈ (Z_ref'A_ref)[L[ix2],L[ix1]]
+        I_ref = sparse(Matrix{Int}(I, length(dict1),length(dict1))[L[ix2],L[ix1]] )
+
+        II = sparseidentity(ix1,ix2)
+        @test I_ref ≈ II
+        @test I_ref - Z'A ≈ (I-Z_ref'A_ref)[L[ix2],L[ix1]]
         indices = LinearIndices(size(dict1))[nonzero_cols(dict1,μ)]
-        @test (LinearAlgebra.I-Zt*A)[:,indices] ≈ ImZA
-        AAZAref = A-A*Zt*A
+        @test (LinearAlgebra.I-Z_ref'*A_ref)[:,indices] ≈ ImZA
+        AAZAref = A_ref-A_ref*Z_ref'*A_ref
         @test (AAZAref)[:,indices] ≈ AAZA
+        @test (AAZAref)[:,indices]≈AAZA
         (AAZAref)[:,indices].=0
         @test norm(AAZAref,1) <1e-9
+    end
+end
+
+@testset "AZSparse: FrameFunInterface" begin
+    err = [1e-2,1e-2,1e-6,1e-1]
+    for (P,N,m,f,e) in zip((P1,P2,P3,P4), (N1,N2,N3,N4), (m1,m2,m3,m4), (f1,f2,f3,f4), err)
+        F = Fun(f, P, N; L=m.*N,solverstyle=AZSparseStyle())
+        @test abserror(f,F) < e
     end
 end
