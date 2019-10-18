@@ -1,5 +1,5 @@
 module BrainScanGrids
-using GridArrays, DomainSets, FrameFun.BasisFunctions, MAT
+using GridArrays, DomainSets, FrameFun.BasisFunctions, MAT, BSON
 using GridArrays: MaskedGrid
 using DomainSets: WrappedDomain
 
@@ -26,9 +26,14 @@ function braindata()
 end
 
 export braingrid
-function braingrid(;opts...)
-    data = braindata()
-    grid = BrainScanGrids.grid(data;isin=k->k!=0,opts...)
+function braingrid(;domain=UnitInterval{Float64}()^3,opts...)
+    # data = braindata()
+    # grid = BrainScanGrids.grid(data;isin=k->k!=0,opts...)
+    PG = ProductGrid(map(PeriodicEquispacedGrid, (256,256,54), infimum(domain), supremum(domain))...)
+    mask = BSON.load(joinpath(splitdir(@__FILE__())[1],"data","test"))[:mask]
+    mask[:,:,1:10] .= 0
+    mask[:,:,48:54] .= 0
+    MaskedGrid(PG, mask, WrappedDomain(PG))
 end
 
 export brainsupport

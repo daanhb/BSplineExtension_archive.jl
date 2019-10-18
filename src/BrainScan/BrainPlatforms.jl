@@ -3,7 +3,7 @@ module BrainPlatforms
 using FrameFun.Platforms, GridArrays, ...AZSparse, FrameFun.ExtensionFrames, FrameFun.BasisFunctions,
     DomainSets, ..BrainScanGrids
 using DomainSets: WrappedDomain
-import FrameFun.Platforms: platform, SolverStyle, SamplingStyle, measure, dictionary, dualdictionary
+import FrameFun.Platforms: platform, SolverStyle, SamplingStyle, measure, dictionary, dualdictionary, correctparamformat
 import FrameFun.FrameFunInterface: platform_grid
 import FrameFun.ExtensionFrames: support
 
@@ -27,6 +27,7 @@ support(platform::BrainPlatform) =
     error("better not to use the support of a BrainPlatform")
 platform_grid(ss::GridStyle, platform::BrainPlatform, param; options...) =
     platform.grid
+correctparamformat(::BrainPlatform, ::NTuple{3,Int}) = true
 
 
 

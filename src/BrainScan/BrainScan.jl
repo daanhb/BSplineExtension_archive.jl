@@ -3,9 +3,9 @@
 # and the degrees as showed the table below
 
 #             | nnz(A)    | nnz(AAZA)
-# p = (1,1,1) |  26271216 |  12888778
-# p = (2,2,2) |  82752678 | 191614327
-# p = (3,3,3) | 168133824 | 840293625
+# p = (1,1,1) |   9,000,916 |   2,419,821
+# p = (2,2,2) |  28,351,071 |  35,717,131
+# p = (3,3,3) |  57,603,712 | 150,645,741
 
 # Only for the lowest degree, it is more efficient to use the sparse AZ algorithm
 
@@ -19,7 +19,7 @@ function brainrhs(;normalized=true, opts...)
     data = braindata()
     b = data[subindices(braingrid(;opts...))]
     if normalized
-        normalize(b)
+        normalize(b, Inf)
     else
         b
     end

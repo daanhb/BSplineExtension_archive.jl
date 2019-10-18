@@ -3,17 +3,18 @@ module BSplinePlatforms
 using FrameFun.Platforms, FrameFun.BasisFunctions, CompactTranslatesDict
 
 
-import FrameFun.Platforms: dictionary, SolverStyle, measure, SamplingStyle, dualdictionary
-import FrameFun.FrameFunInterface: correct_sampling_parameter, regularization_threshold
+import FrameFun.Platforms: dictionary, SolverStyle, measure, SamplingStyle, dualdictionary, correctparamformat
+import FrameFun.FrameFunInterface: correct_sampling_parameter, regularization_threshold, SamplingStrategy
 import FrameFun: dictionary
 
 
 abstract type AbstractPeriodicEquispacedTranslatesPlatform{T,S} <: BasisPlatform end
 
 SolverStyle(p::AbstractPeriodicEquispacedTranslatesPlatform, ::SamplingStyle) = DualStyle()
-correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param, L; options...) = error()
-correct_sampling_parameter(::AbstractPeriodicEquispacedTranslatesPlatform, param::Int, L::Int; options...) =
+correct_sampling_parameter(::SamplingStrategy, ::AbstractPeriodicEquispacedTranslatesPlatform, param, L; options...) = error()
+correct_sampling_parameter(::SamplingStrategy, ::AbstractPeriodicEquispacedTranslatesPlatform, param::Int, L::Int; options...) =
     (round(Int, L/param) * param)
+correctparamformat(::AbstractPeriodicEquispacedTranslatesPlatform, ::Int) = true
 
 abstract type AbstractEpsPeriodicEquispacedTranslatesPlatform{T,S} <: AbstractPeriodicEquispacedTranslatesPlatform{T,S} end
 

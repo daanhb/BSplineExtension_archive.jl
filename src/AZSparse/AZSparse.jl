@@ -36,7 +36,8 @@ function solver(::AZSparseStyle, ap::ApproximationProblem, A::AbstractOperator, 
     AAZA = sparseAAZAmatrix(dict1,dict2,g; atol=threshold)
     verbose && @info "AZSparseStyle: A-AZ^*A has size $(size(AAZA)) and $(nnz(AAZA)) nonzero elements ($(100nnz(AAZA)/prod(size(AAZA)))% fill)"
     verbose && @info "AZSparseStyle: use $(REG) as solver for first AZ step"
-    psolver = IndexExtensionOperator(dict1,colix)*REG(ArrayOperator(sparseAAZAmatrix(dict1,dict2,g; atol=threshold), dict1[colix], dest(A)); verbose=verbose, threshold=threshold, options...)
+    psolver = IndexExtensionOperator(dict1,colix)*REG(ArrayOperator(sparseAAZAmatrix(dict1,dict2,g; atol=threshold), dict1[colix], dest(A));
+        verbose=verbose, threshold=threshold, options...)
     verbose && @info "AZSparseStyle: $(REG) created"
     AZSolver(A, Zt, plunge_op, psolver)
 end

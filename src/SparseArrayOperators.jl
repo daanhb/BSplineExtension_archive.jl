@@ -55,7 +55,6 @@ end
 
 
 function SparseMatrixCSC{Tv,Ti}(M::VerticalBandedMatrix) where {Tv,Ti}
-    @assert !SparseArrays.has_offset_axes(M)
     SparseMatrixCSC(size(M)..., colptr(Ti,M), rowval(Ti,M), nzval(Ti,Tv,M))
 end
 
@@ -69,7 +68,6 @@ rowval(::Type{Ti},M::ExtensionIndexMatrix{T,N}) where {T,Ti,N} = LinearIndices(M
 nzval(::Type{Ti},::Type{Vi},M::IndexMatrix) where {Ti,Vi} = ones(Vi,length(subindices(M)))
 
 function SparseMatrixCSC{Tv,Ti}(M::ExtensionIndexMatrix) where {Tv,Ti}
-    @assert !SparseArrays.has_offset_axes(M)
     SparseMatrixCSC(size(M)..., colptr(Ti,M), rowval(Ti,M), nzval(Ti,Tv,M))
 end
 

@@ -119,9 +119,9 @@ i = 2
     for (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
         @show d, N
         P = ExtensionFramePlatform(NdCDBSplinePlatform((d,d,d)), (0.0..0.5)^3) #hide
-        F,_ = @timed Fun(f, P, (N,N,N);REG=BSplineExtension.BSplineExtensionSolver, crop=true, crop_tol=1e-10, sparse=true, verbose=verbose) #hide
+        F,_ = @timed Fun(f, P, (N,N,N);solverstyle=AZSparseStyle(),verbose=verbose)
         errors[i,j,k] = abserror(f, F) #hide
-        _,timings[i,j,k],_ = @timed Fun(f, P, (N,N,N);REG=BSplineExtension.BSplineExtensionSolver, crop=true, sparse=true, crop_tol=1e-10) #hide
+        _,timings[i,j,k],_ = @timed Fun(f, P, (N,N,N);solverstyle=AZSparseStyle())
     end #hide
 i = 3
     for (j,d) in enumerate(ds), (k,N) in enumerate(Ns1) #hide
